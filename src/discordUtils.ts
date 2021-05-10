@@ -8,11 +8,12 @@ export class DiscordUtils{
         this.serverId = '614956907261722687'
     }
 
-    sendChannelMessage(msg: Message, reply: string): void {
+    async sendChannelMessage(msg: Message, reply: string): Promise<void> {
         msg.channel.send(reply);
+        await msg.delete()
     }
 
-    sendReply(msg: Message, reply: string): void {
+    async sendReply(msg: Message, reply: string): Promise<void> {
         msg.reply(reply);
     }
 

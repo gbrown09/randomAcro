@@ -1,3 +1,4 @@
+import Axios, { AxiosResponse } from 'axios';
 export class Utils {
     static thanks: string[] = [
         'https://tenor.com/view/thankyou-aliceinwonderland-gif-9790628',
@@ -56,6 +57,44 @@ export class Utils {
         var dd = today.getDate().toString().padStart(2, '0');
         var mm = (today.getMonth() + 1).toString().padStart(2, '0'); //January is 0!
         return mm + dd;
-        
+      }
+
+      public static async getURL(url:string){
+        var response;
+        try {
+            response = await Axios.get(url);
+        }
+        catch(e){
+            console.log(e)
+        }
+        return response;
+      }
+
+      public static async getURLAuth(url:string){
+        var response;
+        try {
+            response = await Axios.get(url ,{auth:{
+            username: process.env['USER_NAME'],
+            password: process.env['PASSWORD']
+          }});
+        }
+        catch(e){
+            console.log(e)
+        }
+        return response;
+      }
+
+      public static async postURLAuth(url:string){
+        var response;
+        try {
+            response = await Axios.post(url, {}, {auth:{
+            username: process.env['USER_NAME'],
+            password: process.env['PASSWORD']
+          }});
+        }
+        catch(e) {
+          console.log(e)
+        }
+        return response;
       }
 }

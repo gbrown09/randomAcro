@@ -39,22 +39,9 @@ export class RandomAcro {
         }, time)      
     }
 
-    public checkLimit(msg, rate){
-        if(rate.has(msg.author.id)){
-            this.discordUtils.sendReply(msg, `The all powerful bot creator has decided you're getting too spammy, chill out for a bit and try again later`)
-            return true
-        }  else {
-            return false
-        }   
-    }
-
-    public checkLimitInter(interaction, rate){
-        if(rate.has(interaction.user.id)){
-            this.discordUtils.replyToInteraction(interaction, `The all powerful bot creator has decided you're getting too spammy, chill out for a bit and try again later`)
-            return true
-        }  else {
-            return false
-        }   
+    public checkLimit(id, rate){
+        var check = rate.has(id) ? true : false;
+        return check;
     }
 
     public init() {     
@@ -74,6 +61,7 @@ export class RandomAcro {
             await server.members.fetch();
             that.startBday(bot);
             console.log(`Logged in as ${bot.user.tag}!`);
+
             const slashglob = new Glob(`${__dirname}/../slashCommands/**/*.js`, async function (er, files) {
                 files.forEach(f => {
                   let command = require(f)
@@ -88,7 +76,6 @@ export class RandomAcro {
                     console.log(e)
                 }               
               })
-
             const glob = new Glob(`${__dirname}/../commands/**/*.js`, function (er, files) {
                 files.forEach(f => {
                   let commandClass = require(f).default
@@ -98,12 +85,14 @@ export class RandomAcro {
                   }
                 })
               })
-            
         });
 
         bot.on('message', async msg =>{
             if(msg.author.bot) return;
-            if(this.checkLimit(msg, rate)) return;
+            if(this.checkLimit(msg.author.id, rate)) {
+                this.discordUtils.sendReply(msg, `The all powerful bot creator has decided you're getting too spammy, chill out for a bit and try again later`)
+                return;
+            }
 
             let cmd = msg.content.substring(this.PREFIX.length).split(" ");
             var command = commands.find(c => c.name === cmd[0].toLowerCase());
@@ -119,7 +108,7 @@ export class RandomAcro {
                             commandHelp+= ` {${a}} `
                         })
                     }
-                    help = `${help} ${commandHelp} - ${c.description}\n`;
+                    help = `${help} ${commandHelp} - ${c.description}\n\n`;
                 })
                 this.discordUtils.sendReply(msg,help);
             } else if(cmd[0] == 'rateLimit') {
@@ -133,7 +122,10 @@ export class RandomAcro {
 
         bot.on('interaction', async interaction => {
             if (!interaction.isCommand()) return;
-            if(this.checkLimitInter(interaction, rate)) return;
+            if(this.checkLimit(interaction.user.id, rate)){ 
+                this.discordUtils.replyToInteraction(interaction, `The all powerful bot creator has decided you're getting too spammy, chill out for a bit and try again later`)
+                return;
+            }
             var command = commands.find(c => c.name === interaction.commandName);
             if(command && command.name !== 'help') {
                 await command.executeSlashCommand(interaction, bot);

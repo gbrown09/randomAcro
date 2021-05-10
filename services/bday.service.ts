@@ -47,7 +47,7 @@ export class BdayService {
 
     public async fact(month:string ,day:string) {
         const url= `http://numbersapi.com/${month}/${day}/date`
-        var response = await Axios.get(url);
+        var response = await Utils.getURL(url);
         return response.data;
       }
 

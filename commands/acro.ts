@@ -2,6 +2,7 @@ import { Message, CommandInteraction, CategoryChannel } from "discord.js";
 import { Command } from "interfaces/command.interface";
 import Axios, { AxiosResponse } from 'axios';
 import { DiscordUtils } from '../src/discordUtils'
+import { Utils } from '../src/utils'
 
 export default class Acro implements Command{
     name: string ='acro';
@@ -12,30 +13,14 @@ export default class Acro implements Command{
     
     async executeCommand(message: Message, args?: string[]): Promise<any> {
         let url = this.dataUrl+'randomGet?acronym='+encodeURIComponent(args[0]);
-        try{
-            var response = await Axios.get(url ,{auth:{
-                username: process.env['USER_NAME'],
-                password: process.env['PASSWORD']
-            }});
-        }
-        catch(e){
-            console.log(e)
-        }
+        var response = await Utils.getURLAuth(url)
         this.discordUtils.sendReply(message, response.data)
     }
     
     async executeSlashCommand(interaction: CommandInteraction): Promise<any> {
         let url = this.dataUrl+'randomGet?acronym='+encodeURIComponent(interaction.options[0].value);
         console.log(process.env['USER_NAME'])
-        try{
-            var response = await Axios.get(url ,{auth:{
-                username: process.env['USER_NAME'],
-                password: process.env['PASSWORD']
-            }});
-        }
-        catch(e){
-            console.log(e)
-        }
+        var response = await Utils.getURLAuth(url)
         this.discordUtils.replyToInteractionDeffered(interaction, response.data)
 
         
