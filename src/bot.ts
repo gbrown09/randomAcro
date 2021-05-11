@@ -1,21 +1,22 @@
-import { ApplicationCommandData, Client, ClientOptions, Intents } from 'discord.js';
+import { ApplicationCommandData, Client, ClientOptions, Intents, Message } from 'discord.js';
+import { Glob } from 'glob';
 import BdayService from '../services/bday.service';
 import { Command } from '../interfaces/command.interface';
 import DiscordUtils from './discordUtils';
-import { Glob } from 'glob';
+import Utils from './utils';
 
 export default class RandomAcro {
     dataUrl: string;
 
     PREFIX: string;
 
-    constructor () {
+    constructor() {
         this.init();
         this.PREFIX = '!!';
         this.dataUrl = process.env.WORDS_API_URL;
     }
 
-    static startBday (bot: Client): void {
+    static startBday(bot: Client): void {
         try {
             const bdayService = new BdayService(bot);
             bdayService.startJob();
@@ -24,7 +25,7 @@ export default class RandomAcro {
         }
     }
 
-    static async rateLimitByUser (username: string, time:number, bot:Client, rate: Set<unknown>): Promise<void> {
+    static async rateLimitByUser(username: string, time:number, bot:Client, rate: Set<unknown>): Promise<void> {
         const user = await bot.users.cache.find(person => person.username === username);
         rate.add(user.id);
         setTimeout(() => {
@@ -32,12 +33,28 @@ export default class RandomAcro {
         }, time);
     }
 
-    static checkLimit (id: string, rate: Set<unknown>): boolean {
+    static checkLimit(id: string, rate: Set<unknown>): boolean {
         const check = !!rate.has(id);
         return check;
     }
 
-    public init (): void {
+    static memeStuff(content: string, message: Message): void {
+        if (content.toLowerCase().includes('how many') && content.toLowerCase().includes('?'))
+            DiscordUtils.sendChannelMessage(message, '6');
+
+        if (content.toLowerCase().includes('bad bot') || content.toLowerCase().includes('stupid bot')) {
+            const index = Math.floor(Math.random() * 4);
+            DiscordUtils.sendChannelMessage(message, Utils.sad[index]);
+        }
+        if (content.toLowerCase().includes('good bot')) {
+            const index = Math.floor(Math.random() * 4);
+            DiscordUtils.sendChannelMessage(message, Utils.thanks[index]);
+        }
+        if (content.toLowerCase().includes('idiot bot'))
+            DiscordUtils.sendChannelMessage(message, 'https://tenor.com/view/ryan-stiles-middle-finger-flip-off-pocket-gif-3797474');
+    }
+
+    public init(): void {
         const rate = new Set();
         const commands: Command[] = [];
         const data:ApplicationCommandData[] = [];
@@ -82,6 +99,7 @@ export default class RandomAcro {
         bot.on('message', async msg => {
             if (msg.author.bot)
                 return;
+            RandomAcro.memeStuff(msg.content, msg);
 
             const cmd = msg.content.substring(this.PREFIX.length).split(' ');
             const command = commands.find(c => c.name === cmd[0].toLowerCase());
