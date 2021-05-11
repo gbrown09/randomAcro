@@ -1,10 +1,10 @@
-import { Channel, Client, CommandInteraction, Message } from 'discord.js';
+import { Client, CommandInteraction, Message } from 'discord.js';
 
 export interface Command {
     name: string;
     description: string;
-    strArgs: string [];
+    strArgs: string[];
 
-    executeCommand(message: Message, args?: string[], bot?:Client): Promise<any>;
-    executeSlashCommand(interaction: CommandInteraction, bot?:Client): Promise<any>;
+    executeCommand(message: Message, args?: string[], bot?: Client): Promise<void>;
+    executeSlashCommand(interaction: CommandInteraction, bot?: Client): Promise<void>;
 }

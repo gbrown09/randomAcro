@@ -1,138 +1,130 @@
-import * as Discord from 'discord.js';
-import { cpuUsage } from 'process';
-import { DiscordUtils } from './discordUtils'
-import EightBall from '../commands/eightBall'
-import { glob, Glob } from "glob"
-import { Command } from 'interfaces/command.interface';
-import Acro from 'commands/acro'
-import { ApplicationCommandData } from 'discord.js';
-import { BdayService } from '../services/bday.service';
+import { ApplicationCommandData, Client, ClientOptions, Intents } from 'discord.js';
+import BdayService from '../services/bday.service';
+import { Command } from '../interfaces/command.interface';
+import DiscordUtils from './discordUtils';
+import { Glob } from 'glob';
 
-export class RandomAcro {
+export default class RandomAcro {
     dataUrl: string;
+
     PREFIX: string;
-    discordUtils = new DiscordUtils();
 
-    constructor() {
+    constructor () {
         this.init();
-        this.PREFIX ='!!'
-        this.dataUrl = process.env['WORDS_API_URL'];        
+        this.PREFIX = '!!';
+        this.dataUrl = process.env.WORDS_API_URL;
     }
 
-    public startBday (bot: Discord.Client){
+    static startBday (bot: Client): void {
         try {
-            var bdayService = new BdayService(bot);
+            const bdayService = new BdayService(bot);
             bdayService.startJob();
-            
         } catch (e) {
-            console.log(e)
-
+            console.log(e);
         }
-
     }
 
-    async rateLimitByUser(username, time:number, bot:Discord.Client, rate){
-        var user = await bot.users.cache.find(user => user.username ==username);
+    static async rateLimitByUser (username: string, time:number, bot:Client, rate: Set<unknown>): Promise<void> {
+        const user = await bot.users.cache.find(person => person.username === username);
         rate.add(user.id);
-        setTimeout(function() {
-            rate.delete(user.id)
-        }, time)      
+        setTimeout(() => {
+            rate.delete(user.id);
+        }, time);
     }
 
-    public checkLimit(id, rate){
-        var check = rate.has(id) ? true : false;
+    static checkLimit (id: string, rate: Set<unknown>): boolean {
+        const check = !!rate.has(id);
         return check;
     }
 
-    public init() {     
-        const rate = new Set();  
-        const commands: Command[] = []
-        const data:ApplicationCommandData[]= []
-        const intents = new  Discord.Intents(Discord.Intents.NON_PRIVILEGED);
-        intents.add('GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS', 'DIRECT_MESSAGES', 'GUILD_MEMBERS');
-        const clientOptions: Discord.ClientOptions = {
-            intents: intents
+    public init (): void {
+        const rate = new Set();
+        const commands: Command[] = [];
+        const data:ApplicationCommandData[] = [];
+        const botIntents = new Intents(Intents.NON_PRIVILEGED);
+        botIntents.add('GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS', 'DIRECT_MESSAGES', 'GUILD_MEMBERS');
+        const clientOptions: ClientOptions = {
+            intents: botIntents,
         };
-        const bot = new Discord.Client(clientOptions);
-        let that = this
+        const bot = new Client(clientOptions);
 
-        bot.on('ready', async function()  {
-            var server = await bot.guilds.fetch(that.discordUtils.serverId, true)
+        bot.on('ready', async () => {
+            console.log(DiscordUtils.serverId);
+            const server = await bot.guilds.fetch(DiscordUtils.serverId, true);
             await server.members.fetch();
-            that.startBday(bot);
+            RandomAcro.startBday(bot);
             console.log(`Logged in as ${bot.user.tag}!`);
 
-            const slashglob = new Glob(`${__dirname}/../slashCommands/**/*.js`, async function (er, files) {
+            const slashglob = new Glob(`${__dirname}/../slashCommands/**/*.js`, async (er, files) => {
                 files.forEach(f => {
-                  let command = require(f)
-                  if(command) {
-                    data.push(command);
-                  }
-                })
+                    const command = require(f);
+                    if (command)
+                        data.push(command);
+                });
 
-                try{
+                try {
                     await bot.guilds.cache.get('614956907261722687')?.commands.set(data);
-                }catch(e){
-                    console.log(e)
-                }               
-              })
-            const glob = new Glob(`${__dirname}/../commands/**/*.js`, function (er, files) {
+                } catch (e) {
+                    console.log(e);
+                }
+            });
+            const glob = new Glob(`${__dirname}/../commands/**/*.js`, (er, files) => {
                 files.forEach(f => {
-                  let commandClass = require(f).default
-                  if(commandClass) {
-                    const command = new commandClass() as Command
-                    commands.push(command);
-                  }
-                })
-              })
+                    const CommandClass = require(f).default;
+                    if (CommandClass) {
+                        const command = new CommandClass() as Command;
+                        commands.push(command);
+                    }
+                });
+            });
         });
 
-        bot.on('message', async msg =>{
-            if(msg.author.bot) return;
-            if(this.checkLimit(msg.author.id, rate)) {
-                this.discordUtils.sendReply(msg, `The all powerful bot creator has decided you're getting too spammy, chill out for a bit and try again later`)
+        bot.on('message', async msg => {
+            if (msg.author.bot)
                 return;
-            }
 
-            let cmd = msg.content.substring(this.PREFIX.length).split(" ");
-            var command = commands.find(c => c.name === cmd[0].toLowerCase());
-            if(command && command.name !== 'acrohelp') {
+            const cmd = msg.content.substring(this.PREFIX.length).split(' ');
+            const command = commands.find(c => c.name === cmd[0].toLowerCase());
+            if (command && command.name !== 'acrohelp') {
+                if (RandomAcro.checkLimit(msg.author.id, rate)) {
+                    DiscordUtils.sendReply(msg, `The all powerful bot creator has decided you're getting too spammy, chill out for a bit and try again later`);
+                    return;
+                }
                 cmd.shift();
                 await command.executeCommand(msg, cmd, bot);
-            } else if(cmd[0] === 'acrohelp') {
-                var help = "Here is the list of bot commands: \n"
-                commands.forEach(c =>{
-                    var commandHelp = `!${c.name}`;
-                    if(c.strArgs && c.strArgs.length > 0){
+            } else if (cmd[0] === 'acrohelp') {
+                let help = 'Here is the list of bot commands: \n';
+                commands.forEach(c => {
+                    let commandHelp = `!${c.name}`;
+                    if (c.strArgs && c.strArgs.length > 0)
                         c.strArgs.forEach(a => {
-                            commandHelp+= ` {${a}} `
-                        })
-                    }
+                            commandHelp += ` {${a}} `;
+                        });
+
                     help = `${help} ${commandHelp} - ${c.description}\n\n`;
-                })
-                this.discordUtils.sendReply(msg,help);
-            } else if(cmd[0] == 'rateLimit') {
-                if(msg.author.id == '142777346448031744'){
-                this.rateLimitByUser(cmd[1], parseInt(cmd[2]), bot, rate)
-                } else {
-                    this.discordUtils.sendReply(msg, 'You do not have the power for this')
-                }
+                });
+                DiscordUtils.sendReply(msg, help);
+            } else if (cmd[0] === 'rateLimit') {
+                if (msg.author.id === '142777346448031744')
+                    RandomAcro.rateLimitByUser(cmd[1], parseInt(cmd[2]), bot, rate);
+                else
+                    DiscordUtils.sendReply(msg, 'You do not have the power for this');
             }
-        })
+        });
 
         bot.on('interaction', async interaction => {
-            if (!interaction.isCommand()) return;
-            if(this.checkLimit(interaction.user.id, rate)){ 
-                this.discordUtils.replyToInteraction(interaction, `The all powerful bot creator has decided you're getting too spammy, chill out for a bit and try again later`)
+            if (!interaction.isCommand())
                 return;
-            }
-            var command = commands.find(c => c.name === interaction.commandName);
-            if(command && command.name !== 'help') {
+            const command = commands.find(c => c.name === interaction.commandName);
+            if (command && command.name !== 'help') {
+                if (RandomAcro.checkLimit(interaction.user.id, rate)) {
+                    DiscordUtils.replyToInteraction(interaction, `The all powerful bot creator has decided you're getting too spammy, chill out for a bit and try again later`);
+                    return;
+                }
                 await command.executeSlashCommand(interaction, bot);
             }
-               
-        })
+        });
 
-        bot.login(process.env["BOT_TOKEN"]);
+        bot.login(process.env.BOT_TOKEN);
     }
 }

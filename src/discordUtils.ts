@@ -1,54 +1,45 @@
-import { Message, CommandInteraction, Intents, ClientOptions, Client, TextChannel } from 'discord.js';
-import { Utils } from './utils'
+import { Client, ClientOptions, CommandInteraction, Intents, Message, TextChannel } from 'discord.js';
+import Utils from './utils';
 
-export class DiscordUtils{
-    serverId: string;
-    
-    constructor(){
-        this.serverId = '614956907261722687'
-    }
+export default class DiscordUtils {
+    static serverId = '614956907261722687';
 
-    async sendChannelMessage(msg: Message, reply: string): Promise<void> {
+    static async sendChannelMessage (msg: Message, reply: string): Promise<void> {
         msg.channel.send(reply);
-        await msg.delete()
+        await msg.delete();
     }
 
-    async sendReply(msg: Message, reply: string): Promise<void> {
+    static async sendReply (msg: Message, reply: string): Promise<void> {
         msg.reply(reply);
     }
 
-    async replyToInteraction(interaction: CommandInteraction, reply: string): Promise<any> {
+    static async replyToInteraction (interaction: CommandInteraction, reply: string): Promise<void> {
         await interaction.reply(reply);
     }
 
-    async replyToInteractionDeffered(interaction: CommandInteraction, reply: string): Promise<any> {
+    static async replyToInteractionDeffered (interaction: CommandInteraction, reply: string): Promise<void> {
         await interaction.defer();
         await interaction.editReply(reply);
     }
 
-
-    mentionUser(id:string): string {
+    static mentionUser (id: string): string {
         return `<@!${id}>`;
     }
 
-    async sendToChannelId(channelName: string, reply: string): Promise<void> {
-        const intents = new  Intents(Intents.NON_PRIVILEGED);
+    static async sendToChannelId (channelName: string, reply: string): Promise<void> {
+        const intents = new Intents(Intents.NON_PRIVILEGED);
         intents.add('GUILD_MESSAGES');
-        
+
         const clientOptions: ClientOptions = {
-            intents: intents
+            intents,
         };
         const bot = new Client(clientOptions);
-        bot.on('ready', async () =>{
-        var server = await bot.guilds.fetch(this.serverId);
-        var channel = server.channels.cache.get(Utils.channelIds.get(channelName));
-        (channel as TextChannel).send(reply)
+        bot.on('ready', async () => {
+            const server = await bot.guilds.fetch(DiscordUtils.serverId);
+            const channel = server.channels.cache.get(Utils.channelIds.get(channelName));
+            (channel as TextChannel).send(reply);
+        }).destroy();
 
-        }).destroy()
-
-        bot.login(process.env["BOT_TOKEN"]);
-
-        
+        bot.login(process.env.BOT_TOKEN);
     }
-
 }
