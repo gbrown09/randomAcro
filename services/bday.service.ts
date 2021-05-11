@@ -7,7 +7,7 @@ import { writeFileSync } from 'fs';
 export default class BdayService {
     bdayJob: CronJob;
 
-    static bdays = require('../jsons/bdays.json');
+    static bdays = require('../../jsons/bdays.json');
 
     static bot: Client;
 

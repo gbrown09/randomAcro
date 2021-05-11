@@ -7,7 +7,7 @@
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node -r tsconfig-paths/register main.ts",
-    "start:dev": "SET NODE_ENV=dev&& tsc&& node dist/main.js",
+    "start:dev": "set NODE_ENV=dev&& tsc&& node dist/main.js",
     "lint": "eslint . --ext .ts"
   },
   "keywords": [],
