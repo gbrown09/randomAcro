@@ -137,6 +137,6 @@ export default class BdayService {
     }
 
     public static writeBdays (): void {
-        writeFileSync(`${__dirname}/../jsons/bdays.json`, JSON.stringify(BdayService.bdays, null, 2), 'utf-8');
+        writeFileSync(`${__dirname}/../../jsons/bdays.json`, JSON.stringify(BdayService.bdays, null, 2), 'utf-8');
     }
 }
