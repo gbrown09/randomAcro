@@ -9,7 +9,7 @@ export default class Poll implements Command {
 
     description = `make a poll  for votin`;
 
-    strArgs: string[] = [ 'question; choice; choice;' ];
+    strArgs: string[] = [ 'question; choice; choice; (if no choices are given it will be yes or no)' ];
 
     yes = get('white_check_mark');
 

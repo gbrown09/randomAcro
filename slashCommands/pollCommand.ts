@@ -14,7 +14,6 @@ module.exports = {
             name: 'choices',
             description: 'give the people choices to vote on seperated by ;',
             default: false,
-            required: true,
         },
     ],
 };
