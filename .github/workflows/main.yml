@@ -35,6 +35,7 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Start Bot
         run: | 
-            pm2 start "npm run start:dev" --name randomAcro
+            pm2 delete -s randomAcro || : pm2 start "npm run start:dev" --name randomAcro
             pm2 save
+            pm2 startup
      
