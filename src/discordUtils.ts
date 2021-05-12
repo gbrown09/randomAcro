@@ -2,7 +2,7 @@ import { Client, ClientOptions, CommandInteraction, Intents, Message, TextChanne
 import Utils from './utils';
 
 export default class DiscordUtils {
-    static serverId = '614956907261722687';
+    static serverId = process.env.DISCORD_SERVER_ID;
 
     static async sendChannelMessage (msg: Message, reply: string, del = true): Promise<void> {
         msg.channel.send(reply);

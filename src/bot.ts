@@ -16,8 +16,9 @@ export default class RandomAcro {
 
     constructor() {
         this.init();
-        this.PREFIX = '!!';
+        this.PREFIX = '!';
         this.dataUrl = process.env.WORDS_API_URL;
+        DiscordUtils.serverId = process.env.DISCORD_SERVER_ID;
     }
 
     static startBday(bot: Client): void {
@@ -45,7 +46,7 @@ export default class RandomAcro {
     static theThing(message: Message): void {
         if (!this.messageStore.has(message.channel.id)) {
             this.messageStore.set(message.channel.id, message.author.id);
-        } else if((this.messageStore.has(message.channel.id) && (this.messageStore.get(message.channel.id).value !== message.author.id))) {
+        } else if((this.messageStore.has(message.channel.id) && (this.messageStore.get(message.channel.id) !== message.author.id))) {
             DiscordUtils.sendChannelMessage(message, message.content, false);
             this.messageStore.delete(message.channel.id);
         } else {
@@ -81,7 +82,6 @@ export default class RandomAcro {
         const bot = new Client(clientOptions);
 
         bot.on('ready', async () => {
-            console.log(DiscordUtils.serverId);
             const server = await bot.guilds.fetch(DiscordUtils.serverId, true);
             await server.members.fetch();
             RandomAcro.startBday(bot);
@@ -95,7 +95,7 @@ export default class RandomAcro {
                 });
 
                 try {
-                    await bot.guilds.cache.get('614956907261722687')?.commands.set(data);
+                    await bot.guilds.cache.get(DiscordUtils.serverId)?.commands.set(data);
                 } catch (e) {
                     console.log(e);
                 }

@@ -16,7 +16,7 @@ export default class Poll implements Command {
     no = get('x');
 
     async executeCommand (message: Message): Promise<void> {
-        const choices = message.content.slice(6).trim().split(';');
+        const choices = message.content.slice(5).trim().split(';');
         const question = choices[0];
         if (!question) {
             DiscordUtils.sendReply(message, `Usage: \`!poll  Question ; Choice 1 ; Choice 2 ; Choice 3 ...\``);
@@ -30,7 +30,7 @@ export default class Poll implements Command {
                 await message.delete();
             });
 
-        const reactArgs = message.content.slice(6).trim().split(' ');
+        const reactArgs = message.content.slice(5).trim().split(' ');
         if (typeof parseInt(reactArgs[0]) === 'number' && reactArgs.length === 1)
             try {
                 const lastMessage = await message.fetch();
