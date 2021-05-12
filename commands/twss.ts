@@ -12,7 +12,7 @@ export default class Twss implements Command {
 
     async executeCommand (message: Message): Promise<void> {
         const index = Math.floor(Math.random() * 4);
-        DiscordUtils.sendChannelMessage(message, Utils.twss[index]);
+        DiscordUtils.sendChannelMessage(message, Utils.twss[index], false);
     }
 
     async executeSlashCommand (interaction: CommandInteraction): Promise<void> {
