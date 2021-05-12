@@ -45,7 +45,7 @@ export default class RandomAcro {
 
     static theThing(message: Message): void {
         if (!this.messageStore.has(message.channel.id)) {
-            this.messageStore.set(message.channel.id, message.author.id);
+            this.messageStore.set(message.channel.id, message.author.id); //needs message content
         } else if((this.messageStore.has(message.channel.id) && (this.messageStore.get(message.channel.id) !== message.author.id))) {
             DiscordUtils.sendChannelMessage(message, message.content, false);
             this.messageStore.delete(message.channel.id);
@@ -117,7 +117,7 @@ export default class RandomAcro {
             if(Utils.excludedChannels.includes(msg.channel.id)) 
                 return;
             RandomAcro.memeStuff(msg.content, msg);
-            RandomAcro.theThing(msg);
+            //RandomAcro.theThing(msg);
 
             const cmd = msg.content.substring(this.PREFIX.length).split(' ');
             const command = commands.find(c => c.name === cmd[0].toLowerCase());
