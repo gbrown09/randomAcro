@@ -30,7 +30,9 @@ jobs:
         run: npm install
 
       - name: Copy over config
-        run: cp ~/Documents/dev.env /environment/dev.env
+        run: |
+            pwd
+            cp ~/Documents/dev.env /environment/dev.env
 
       # Runs a set of commands using the runners shell
       - name: Restart Bot
