@@ -18,7 +18,7 @@ jobs:
   backup_bdays:
      runs-on: self-hosted
      steps:
-        name: Make Bdays backup
+      - name: Make Bdays backup
         run: |
           cp ./jsons/bdays.json ~/Documents/bdays.json
   # This workflow contains a single job called "build"
