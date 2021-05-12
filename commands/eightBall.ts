@@ -17,6 +17,7 @@ export default class EightBall implements Command {
 
     async executeSlashCommand (interaction: CommandInteraction): Promise<void> {
         const index = Math.floor(Math.random() * 13);
-        DiscordUtils.replyToInteraction(interaction, Utils.eightBall[index]);
+        const reply = `You asked: ${interaction.options[0].value}\nThe answer is: `;
+        DiscordUtils.replyToInteraction(interaction, reply+Utils.eightBall[index]);
     }
 }
