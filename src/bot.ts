@@ -10,6 +10,10 @@ export default class RandomAcro {
 
     PREFIX: string;
 
+    static messageStore = new Map();
+
+    static author = new Set() ;
+
     constructor() {
         this.init();
         this.PREFIX = '!!';
@@ -38,20 +42,31 @@ export default class RandomAcro {
         return check;
     }
 
+    static theThing(message: Message): void {
+        if (!this.messageStore.has(message.channel.id)) {
+            this.messageStore.set(message.channel.id, message.author.id);
+        } else if((this.messageStore.has(message.channel.id) && (this.messageStore.get(message.channel.id).value !== message.author.id))) {
+            DiscordUtils.sendChannelMessage(message, message.content, false);
+            this.messageStore.delete(message.channel.id);
+        } else {
+            this.messageStore.set(message.channel.id, message.author.id);
+        }
+    }
+
     static memeStuff(content: string, message: Message): void {
         if (content.toLowerCase().includes('how many') && content.toLowerCase().includes('?'))
-            DiscordUtils.sendChannelMessage(message, '6');
+            DiscordUtils.sendChannelMessage(message, '6', false);
 
         if (content.toLowerCase().includes('bad bot') || content.toLowerCase().includes('stupid bot')) {
             const index = Math.floor(Math.random() * 4);
-            DiscordUtils.sendChannelMessage(message, Utils.sad[index]);
+            DiscordUtils.sendChannelMessage(message, Utils.sad[index], false);
         }
         if (content.toLowerCase().includes('good bot')) {
             const index = Math.floor(Math.random() * 4);
-            DiscordUtils.sendChannelMessage(message, Utils.thanks[index]);
+            DiscordUtils.sendChannelMessage(message, Utils.thanks[index], false);
         }
         if (content.toLowerCase().includes('idiot bot'))
-            DiscordUtils.sendChannelMessage(message, 'https://tenor.com/view/ryan-stiles-middle-finger-flip-off-pocket-gif-3797474');
+            DiscordUtils.sendChannelMessage(message, 'https://tenor.com/view/ryan-stiles-middle-finger-flip-off-pocket-gif-3797474', false);
     }
 
     public init(): void {
@@ -99,7 +114,10 @@ export default class RandomAcro {
         bot.on('message', async msg => {
             if (msg.author.bot)
                 return;
+            if(Utils.excludedChannels.includes(msg.channel.id)) 
+                return;
             RandomAcro.memeStuff(msg.content, msg);
+            RandomAcro.theThing(msg);
 
             const cmd = msg.content.substring(this.PREFIX.length).split(' ');
             const command = commands.find(c => c.name === cmd[0].toLowerCase());

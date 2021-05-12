@@ -47,6 +47,14 @@ export default class Utils {
         '228322496955416576',
     ];
 
+    static twss: string[] = [
+        'https://tenor.com/view/michaelscott-theoffice-thats-what-she-said-gif-4084628',
+        'https://tenor.com/view/thats-what-she-said-michael-scott-smile-shrug-thats-all-gif-16786963',
+        'https://tenor.com/view/thats-what-she-said-inside-joke-memes-eyebrow-raise-you-know-what-imean-gif-15770443',
+        'https://tenor.com/view/thatswhatshesaid-michaelscott-theoffice-thatswhatshe-thatswhat-gif-9531422',
+
+    ];
+
     static channelIds: Map<string, string> = new Map([
         [ 'general', '614956907894931478' ],
         [ 'aint-played-nobody-pawl', '614897075095732258' ],
