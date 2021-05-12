@@ -30,12 +30,11 @@ jobs:
         run: npm install
 
       - name: Copy over config
-        run: cp ~/Documents/dev.env ./environment/dev.env
+        run: |
+            mkdir -p environment
+            cp ~/Documents/dev.env ./environment/dev.env
 
       # Runs a set of commands using the runners shell
       - name: Start Bot
         run: | 
-            pm2 delete -s randomAcro || : pm2 start "npm run start:dev" --name randomAcro
-            pm2 save
-            pm2 startup
-     
+            pm2 delete -s randomAcro || : && pm2 start "npm run start:dev" --name randomAcro
