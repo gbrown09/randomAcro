@@ -33,6 +33,8 @@ jobs:
         run: cp ~/Documents/dev.env ./environment/dev.env
 
       # Runs a set of commands using the runners shell
-      - name: Restart Bot
-        run: python environment/botRestart.py
+      - name: Start Bot
+        run: | 
+            pm2 start "npm run start:dev" --name randomAcro
+            pm2 save
      
