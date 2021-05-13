@@ -18,10 +18,11 @@ jobs:
   backup_bdays:
      runs-on: self-hosted
      steps:
-      - name: Make Bdays backup
-        run: |
-          pm2 stop bot
-          cp ./jsons/bdays.json ~/Documents/bdays.json
+      - name: Stop Bot
+        run: pm2 stop bot
+
+      - name: copy jsons
+        run: cp ./jsons/bdays.json ~/Documents/bdays.json
   # This workflow contains a single job called "build"
   build_deploy:
     # The type of runner that the job will run on
