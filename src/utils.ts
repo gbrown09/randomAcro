@@ -15,6 +15,10 @@ export default class Utils {
         "Well that's hurtful :(",
     ];
 
+    static rekt: string[] = [
+        'https://tenor.com/view/supa-hot-fire-rekt-burn-popopo-im-not-arapper-gif-4910167',
+    ];
+
     static eightBall: string[] = [
         'Without a doubt.',
         'Outlook good.',
