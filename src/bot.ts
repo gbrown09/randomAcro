@@ -44,18 +44,14 @@ export default class RandomAcro {
     }
 
     static async theThing(message: Message): Promise<void> {
-        if (!this.messageStore.has(message.channel.id)) 
-            this.messageStore.set(message.channel.id, message); //needs message content
-        else if((this.messageStore.has(message.channel.id) && (this.messageStore.get(message.channel.id).author.id !== message.author.id))) 
-            for(const key of this.messageStore.keys()) {
-                const old = await message.channel.messages.fetch(this.messageStore.get(key).id);
-                if(old.content === message.content) {
-                    DiscordUtils.sendChannelMessage(message, message.content, false);
-                    this.messageStore.delete(message.channel.id);
-                }
-            }           
-        else 
+        if (!this.messageStore.has(message.channel.id)) {
             this.messageStore.set(message.channel.id, message);
+        } else if((this.messageStore.get(message.channel.id) === message && (this.messageStore.get(message.channel.id).author.id !== message.author.id))) {
+            DiscordUtils.sendChannelMessage(message, message.content, false);
+            this.messageStore.delete(message.channel.id);
+        } else { 
+            this.messageStore.set(message.channel.id, message);
+        }
     }
 
     static memeStuff(content: string, message: Message): void {
