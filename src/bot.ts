@@ -46,7 +46,7 @@ export default class RandomAcro {
     static async theThing(message: Message): Promise<void> {
         if (!this.messageStore.has(message.channel.id)) {
             this.messageStore.set(message.channel.id, message);
-        } else if((this.messageStore.get(message.channel.id) === message && (this.messageStore.get(message.channel.id).author.id !== message.author.id))) {
+        } else if((this.messageStore.get(message.channel.id).content === message.content && (this.messageStore.get(message.channel.id).author.id !== message.author.id))) {
             DiscordUtils.sendChannelMessage(message, message.content, false);
             this.messageStore.delete(message.channel.id);
         } else { 
