@@ -60,7 +60,7 @@ export default class Utils {
     ];
 
     static channelIds: Map<string, string> = new Map([
-        [ 'general', '614956907894931478' ],
+        [ 'general', '105814173388156928' ],
         [ 'aint-played-nobody-pawl', '614897075095732258' ],
     ]);
 

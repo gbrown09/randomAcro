@@ -56,12 +56,13 @@ export default class BdayService {
             noBdayString = `${noBdayString}you need to let me know. Try !addbday`;
         } else {
             try {
-                const user = await BdayService.bot.users.cache.find(person => person.username === input);
+                const server = await BdayService.bot.guilds.fetch(DiscordUtils.serverId);
+                const user =  await server.members.fetch({query: input, limit:1});
                 if (!user) {
                     DiscordUtils.sendReply(msg, 'check the user name, the name before the numbers. No nicknames');
                     return;
                 }
-                userid = user.id;
+                userid = user.first().user.id;
                 bdayString = 'Their bday is';
                 noBdayString = `${noBdayString}ask them to let me know`;
             } catch (e) {
