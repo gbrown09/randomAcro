@@ -32,12 +32,13 @@ export default class BdayService {
             if (BdayService.bdays[user] === today)
                 bdaysToday.push(user);
 
-        if (bdaysToday.length > 0)
+        if (bdaysToday.length > 0) {
             bdaysToday.forEach(user => {
                 bdaystring = `${bdaystring + DiscordUtils.mentionUser(user)} `;
             });
+            DiscordUtils.sendToChannelId('general', `${bdaystring}<:birthday:804063725904330772> \n\n${newFact}`);
+        }
 
-        DiscordUtils.sendToChannelId('general', `${bdaystring}<:birthday:804063725904330772> \n\n${newFact}`);
     }
 
     static async fact (month: string, day: string): Promise<string> {
