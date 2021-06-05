@@ -117,12 +117,12 @@ export default class BdayService {
 
         const bdayList = await Utils.getURL('http://localhost:3000/bday/bdays');
         bdayList.data.forEach(bday => {
-            allDays.push(bday.userId);
+            allDays.push(bday.date);
         });
 
         allDays.forEach(day => {
             next.setMonth(parseInt(day.substring(0, 2)) - 1);
-            next.setDate(parseInt(day.substring(2, 4)));
+            next.setDate(parseInt(day.substring(3, 5)));
             next.setFullYear(today.getFullYear());
             let diffTime = next.getTime() - today.getTime();
             if (Math.sign(diffTime) === -1) {
@@ -141,26 +141,27 @@ export default class BdayService {
             }
 
         bdayList.data.forEach(bday => {
-            if (bday.date === today)
+            if (bday.date === finalDay)
                 bdaysNext.push(bday.userId);
         });
 
         for (const person of bdaysNext)
             try {
                 const user = await bot.users.fetch(person);
+                console.log(person);
                 nextString = `${nextString + user.username} `;
             } catch (e) {
                 console.log(e);
             }
 
-        finalDay = `${finalDay.substring(0, 2)}/${finalDay.substring(2, 4)}`;
+        finalDay = `${finalDay.substring(0, 2)}/${finalDay.substring(3, 5)}`;
         return `The next bday is ${finalDay} which is ${difference} days away. People born that day: ${nextString}`;
     }
 
     static dateDiff (date: Date): number {
         const today = new Date();
         let diffTime = date.getTime() - today.getTime();
-        const next = new Date();
+        let next: Date;
         if (Math.sign(diffTime) === -1) {
             date.setFullYear(today.getFullYear() + 1);
             diffTime = next.getTime() - today.getTime();
