@@ -1,4 +1,4 @@
-import Axios from 'axios';
+import Axios, { AxiosResponse } from 'axios';
 
 export default class Utils {
     static thanks: string[] = [
@@ -62,23 +62,34 @@ export default class Utils {
     static channelIds: Map<string, string> = new Map([
         [ 'general', '105814173388156928' ],
         [ 'aint-played-nobody-pawl', '614897075095732258' ],
+        [ 'test', '614956907894931478' ],
     ]);
 
     public static getCurrentDate (): string {
         const today = new Date();
         const dd = today.getDate().toString().padStart(2, '0');
         const mm = (today.getMonth() + 1).toString().padStart(2, '0'); // January is 0!
-        return mm + dd;
+        return `${mm}/${dd}`;
     }
 
-    public static async getURL (url: string): Promise<string> {
-        let response;
+    public static async getURL (url: string): Promise<AxiosResponse> {
+        let response: AxiosResponse;
         try {
             response = await Axios.get(url);
         } catch (e) {
             console.log(e);
         }
-        return response.data;
+        return response;
+    }
+
+    public static async postURL (url: string, data: any): Promise<AxiosResponse> {
+        let response: AxiosResponse;
+        try {
+            response = await Axios.post(url, data);
+        } catch (e) {
+            //console.log(e);
+        }
+        return response;
     }
 
     public static async getURLAuth (url: string): Promise<string> {

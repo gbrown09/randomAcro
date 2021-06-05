@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from 'discord.js';
-import BdayService from '../services/bday.service';
+import Axios from 'axios';
 import { Command } from '../interfaces/command.interface';
 import DiscordUtils from '../src/discordUtils';
 
@@ -12,22 +12,20 @@ export default class AddBday implements Command {
 
     async executeCommand (message: Message): Promise<void> {
         const { id } = message.author;
-        if (Object.prototype.hasOwnProperty.call(BdayService.bdays, id)) {
-            delete BdayService.bdays[id];
-            BdayService.writeBdays();
+        try {
+            await Axios.delete(`http://localhost:3000/bday/delete?id=${id}`);
             DiscordUtils.sendReply(message, `Your bday has been deleted, guess you hate celebrations`);
-        } else {
+        } catch(e) {
             DiscordUtils.sendReply(message, `I don't have your bday`);
         }
     }
 
     async executeSlashCommand (interaction: CommandInteraction): Promise<void> {
         const { id } = interaction.user;
-        if (Object.prototype.hasOwnProperty.call(BdayService.bdays, id)) {
-            delete BdayService.bdays[id];
-            BdayService.writeBdays();
+        try {
+            await Axios.delete(`http://localhost:3000/bday/delete?id=${id}`);
             DiscordUtils.replyToInteraction(interaction, `Your bday has been deleted, guess you hate celebrations`);
-        } else {
+        } catch(e) {
             DiscordUtils.replyToInteraction(interaction, `I don't have your bday`);
         }
     }

@@ -1,6 +1,7 @@
 import { Client, CommandInteraction, Message } from 'discord.js';
 import BdayService from '../services/bday.service';
 import { Command } from '../interfaces/command.interface';
+import DiscordUtils from '../src/discordUtils';
 
 export default class Bday implements Command {
     name = 'bday';
@@ -13,19 +14,21 @@ export default class Bday implements Command {
 
     async executeCommand (message: Message, args?: string[], bot?: Client): Promise<void> {
         this.bdayService = new BdayService(bot);
-        if (args[0] === '')
-            BdayService.checkBday(message, '');
-
+        let reply;
+        if (args[0] === '') 
+            reply = await BdayService.checkBday(message.author.id, '');
         else
-            BdayService.checkBday(message, args[0]);
+            reply = await BdayService.checkBday(message.author.id, args[0]);
+        DiscordUtils.sendReply(message, reply);
     }
 
     async executeSlashCommand (interaction: CommandInteraction, bot?: Client): Promise<void> {
         this.bdayService = new BdayService(bot);
-        if (interaction.options.length === 0)
-            BdayService.checkBdaySlash(interaction, '');
-
+        let reply;
+        if (interaction.options.length === 0) 
+            reply = await BdayService.checkBday(interaction.user.id, '');
         else
-            BdayService.checkBdaySlash(interaction, interaction.options[0].value.toString());
+            reply = await  BdayService.checkBday(interaction.user.id, interaction.options[0].value.toString());
+        DiscordUtils.replyToInteraction(interaction, reply);
     }
 }
