@@ -15,14 +15,11 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  backup_bdays:
+  stop_bot:
      runs-on: self-hosted
      steps:
       - name: Stop Bot
         run: pm2 stop bot
-
-      - name: copy jsons
-        run: cp ./jsons/bdays.json ~/Documents/bdays.json
   # This workflow contains a single job called "build"
   build_deploy:
     # The type of runner that the job will run on
@@ -42,7 +39,6 @@ jobs:
             mkdir -p environment
             cp ~/Documents/dev.env ./environment/dev.env
             cp ~/Documents/prod.env ./environment/prod.env
-            mv ~/Documents/bdays.json ./jsons/bdays.json
 
       # Runs a set of commands using the runners shell
       - name: Start Bot

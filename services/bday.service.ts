@@ -148,7 +148,6 @@ export default class BdayService {
         for (const person of bdaysNext)
             try {
                 const user = await bot.users.fetch(person);
-                console.log(person);
                 nextString = `${nextString + user.username} `;
             } catch (e) {
                 console.log(e);
