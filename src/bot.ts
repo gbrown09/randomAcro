@@ -43,6 +43,24 @@ export default class RandomAcro {
         return check;
     }
 
+    static updateCommands(bot: Client): void {
+        const data :ApplicationCommandData[] = [];
+
+        const slashglob = new Glob(`${__dirname}/../slashCommands/**/*.js`, async (er, files) => {
+            files.forEach(f => {
+                const command = require(f);
+                if (command)
+                    data.push(command);
+            });
+
+            try {
+                await bot.guilds.cache.get(DiscordUtils.serverId)?.commands.set(data);
+            } catch (e) {
+                console.log(e);
+            }
+        });
+    }
+
     static async theThing(message: Message): Promise<void> {
         if (!this.messageStore.has(message.channel.id)) {
             this.messageStore.set(message.channel.id, message);
@@ -73,7 +91,6 @@ export default class RandomAcro {
     public init(): void {
         const rate = new Set();
         const commands: Command[] = [];
-        const data:ApplicationCommandData[] = [];
         const botIntents = new Intents(Intents.NON_PRIVILEGED);
         botIntents.add('GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS', 'DIRECT_MESSAGES', 'GUILD_MEMBERS');
         const clientOptions: ClientOptions = {
@@ -85,21 +102,6 @@ export default class RandomAcro {
             const server = await bot.guilds.fetch(DiscordUtils.serverId, true);
             await server.members.fetch();
             RandomAcro.startBday(bot);
-            console.log(`Logged in as ${bot.user.tag}!`);
-
-            const slashglob = new Glob(`${__dirname}/../slashCommands/**/*.js`, async (er, files) => {
-                files.forEach(f => {
-                    const command = require(f);
-                    if (command)
-                        data.push(command);
-                });
-
-                try {
-                    await bot.guilds.cache.get(DiscordUtils.serverId)?.commands.set(data);
-                } catch (e) {
-                    console.log(e);
-                }
-            });
             const glob = new Glob(`${__dirname}/../commands/**/*.js`, (er, files) => {
                 files.forEach(f => {
                     const CommandClass = require(f).default;
@@ -109,6 +111,7 @@ export default class RandomAcro {
                     }
                 });
             });
+            console.log(`Logged in as ${bot.user.tag}!`); 
         });
 
         bot.on('message', async msg => {
@@ -144,7 +147,12 @@ export default class RandomAcro {
                 if (msg.author.id === '142777346448031744')
                     RandomAcro.rateLimitByUser(cmd[1], parseInt(cmd[2]), bot, rate);
                 else
-                    DiscordUtils.sendReply(msg, 'You do not have the power for this');
+                    DiscordUtils.sendReply(msg, 'You do not have the power for this'); 
+            } else if (cmd[0] === 'updateCommands') {
+                if (msg.author.id === '142777346448031744') {
+                    RandomAcro.updateCommands(bot);
+                    console.log("updated commands");
+                }
             }
         });
 
