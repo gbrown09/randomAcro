@@ -31,11 +31,17 @@ export default class RandomAcro {
     }
 
     static async rateLimitByUser(username: string, time:number, bot:Client, rate: Set<unknown>): Promise<void> {
-        const user = await bot.users.cache.find(person => person.username === username);
-        rate.add(user.id);
-        setTimeout(() => {
-            rate.delete(user.id);
-        }, time);
+        try {
+            const server = await bot.guilds.fetch(DiscordUtils.serverId);
+            const user =  await server.members.fetch({query: username, limit:1});
+            console.log(username);
+            rate.add(user.first().user.id);
+            setTimeout(() => {
+                rate.delete(user.first().user.id);
+            }, time);
+        } catch(e){
+            console.log(e);
+        }
     }
 
     static checkLimit(id: string, rate: Set<unknown>): boolean {
@@ -95,6 +101,7 @@ export default class RandomAcro {
         botIntents.add('GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS', 'DIRECT_MESSAGES', 'GUILD_MEMBERS');
         const clientOptions: ClientOptions = {
             intents: botIntents,
+            partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
         };
         const bot = new Client(clientOptions);
 

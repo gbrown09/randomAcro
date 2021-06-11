@@ -86,7 +86,7 @@ export default class BdayService {
         date.setDate(parseInt(day));
         date.setFullYear(today.getFullYear());
         const days = BdayService.dateDiff(date);
-        return `${bdayString} ${month}/${day} and is ${days} days awaytest. ${newFact}`;
+        return `${bdayString} ${month}/${day} and is ${days} days away. ${newFact}`;
     }
 
     public static async addBday (id: string, date: string): Promise<string> {

@@ -4,7 +4,7 @@ import { Command } from '../interfaces/command.interface';
 import DiscordUtils from '../src/discordUtils';
 import Utils from '../src/utils';
 
-export default class Twss implements Command {
+export default class Bdays implements Command {
     name = 'bdays';
 
     description = `gets a list of bdays`;
