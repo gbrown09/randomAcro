@@ -1,8 +1,8 @@
 import { ApplicationCommandData, Client, ClientOptions, Intents, Message } from 'discord.js';
-import { Glob } from 'glob';
 import BdayService from '../services/bday.service';
 import { Command } from '../interfaces/command.interface';
 import DiscordUtils from './discordUtils';
+import { Glob } from 'glob';
 import Utils from './utils';
 
 export default class RandomAcro {
