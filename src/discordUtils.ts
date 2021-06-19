@@ -1,4 +1,4 @@
-import { Client, ClientOptions, CommandInteraction, Intents, Message, TextChannel } from 'discord.js';
+import { Client, ClientOptions, CommandInteraction, Intents, Interaction, Message, TextChannel } from 'discord.js';
 import Utils from './utils';
 
 export default class DiscordUtils {
@@ -8,6 +8,12 @@ export default class DiscordUtils {
         msg.channel.send(reply);
         if (del)
             await msg.delete();
+    }
+
+    static async sendChannelMessageInt (interaction: Interaction, reply: string): Promise<void> {
+        const channel = await interaction.channel.fetch();
+        (channel as TextChannel).send(reply);
+    
     }
 
     static async sendReply (msg: Message, reply: string): Promise<void> {
