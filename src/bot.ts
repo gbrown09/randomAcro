@@ -160,6 +160,10 @@ export default class RandomAcro {
                     RandomAcro.updateCommands(bot);
                     console.log("updated commands");
                 }
+            } else if (cmd[0] === 'phil') {
+                const index = Math.floor(Math.random() * 15);
+                console.log(index);
+                DiscordUtils.sendChannelMessage(msg, Utils.copyPasta[index]);
             }
         });
 

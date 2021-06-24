@@ -11,8 +11,13 @@ export default class FeatRequest implements Command {
     strArgs: string[] = ['request string'];
 
     async executeCommand(message: Message): Promise<void> {
-        const done = await Utils.postURL('http://localhost:3000/feature-request/update', {request: message.content.substring(10)});
-        DiscordUtils.sendReply(message, await done.data.message);
+        if (message.author.id === '142777346448031744'){
+            const done = await Utils.postURL('http://localhost:3000/feature-request/update', {request: message.content.substring(10)});
+            DiscordUtils.sendReply(message, await done.data.message);
+        }
+        else {
+            DiscordUtils.sendReply(message, `You can't do that`);
+        }
     }
     async executeSlashCommand(): Promise<void> {
         return;

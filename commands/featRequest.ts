@@ -43,7 +43,7 @@ export default class FeatRequest implements Command {
                 done: false,
             };
             const reply = await Utils.postURL('http://localhost:3000/feature-request/create', featureRequest);
-            if (featureRequest.userId === '348947681642545152'|| featureRequest.userId === '133027938051424256') {
+            if (featureRequest.userId === '348947681642545152') {
                 DiscordUtils.replyToInteractionDeffered(interaction, `Filing this one away as important thanks ${featureRequest.userName}`);
                 DiscordUtils.sendChannelMessageInt(interaction, `https://tenor.com/6R88.gif`);
             } else {
