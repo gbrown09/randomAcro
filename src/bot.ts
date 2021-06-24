@@ -161,8 +161,7 @@ export default class RandomAcro {
                     console.log("updated commands");
                 }
             } else if (cmd[0] === 'phil') {
-                const index = Math.floor(Math.random() * 15);
-                console.log(index);
+                const index = Math.floor(Math.random() * Utils.copyPasta.length);
                 DiscordUtils.sendChannelMessage(msg, Utils.copyPasta[index]);
             }
         });
