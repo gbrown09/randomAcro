@@ -69,7 +69,11 @@ export default class RandomAcro {
     }
 
     static turnOn(){
-        exec('wakeonlan B4:2E:99:F1:F0:6A');
+        exec('wakeonlan -i 192.168.1.225 b4:2e:99:f1:f0:6a', (err) => {
+            if (err){
+                console.log(err);
+            }
+        });
     }
 
     static async theThing(message: Message): Promise<void> {
@@ -169,7 +173,9 @@ export default class RandomAcro {
                 const index = Math.floor(Math.random() * Utils.copyPasta.length);
                 DiscordUtils.sendChannelMessage(msg, Utils.copyPasta[index]);
             } else if (cmd[0] === 'turnon') {
+                if (msg.author.id === '142777346448031744') {
                 RandomAcro.turnOn();
+                }
             }
         });
 
