@@ -2,6 +2,7 @@ import { ApplicationCommandData, Client, ClientOptions, Intents, Message } from 
 import BdayService from '../services/bday.service';
 import { Command } from '../interfaces/command.interface';
 import DiscordUtils from './discordUtils';
+import { exec } from 'child_process';
 import { Glob } from 'glob';
 import Utils from './utils';
 
@@ -67,6 +68,10 @@ export default class RandomAcro {
         });
     }
 
+    static turnOn(){
+        exec('wakeonlan B4:2E:99:F1:F0:6A');
+    }
+
     static async theThing(message: Message): Promise<void> {
         if (!this.messageStore.has(message.channel.id)) {
             this.messageStore.set(message.channel.id, message);
@@ -108,7 +113,7 @@ export default class RandomAcro {
         bot.on('ready', async () => {
             const server = await bot.guilds.fetch(DiscordUtils.serverId, true);
             await server.members.fetch();
-            RandomAcro.startBday(bot);
+            //RandomAcro.startBday(bot);
             const glob = new Glob(`${__dirname}/../commands/**/*.js`, (er, files) => {
                 files.forEach(f => {
                     const CommandClass = require(f).default;
@@ -163,6 +168,8 @@ export default class RandomAcro {
             } else if (cmd[0] === 'phil') {
                 const index = Math.floor(Math.random() * Utils.copyPasta.length);
                 DiscordUtils.sendChannelMessage(msg, Utils.copyPasta[index]);
+            } else if (cmd[0] === 'turnon') {
+                RandomAcro.turnOn();
             }
         });
 
