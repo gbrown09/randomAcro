@@ -98,8 +98,8 @@ export default class RandomAcro {
     public init(): void {
         const rate = new Set();
         const commands: Command[] = [];
-        const botIntents = new Intents(Intents.FLAGS.GUILD_MESSAGES);
-        botIntents.add(Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_MEMBERS);
+        const botIntents = new Intents();
+        botIntents.add(Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS);
         const clientOptions: ClientOptions = {
             intents: botIntents,
             partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
