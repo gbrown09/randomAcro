@@ -44,19 +44,25 @@ export default class Poll implements Command {
     }
 
     async executeSlashCommand (interaction: CommandInteraction): Promise<void> {
-        const choices = interaction.options.getString('choices').trim().split(';');
+        let choices =[];
+        if (interaction.options.getString('choices') !== null)
+            choices = interaction.options.getString('choices').trim().split(';');
+     
         const question = interaction.options.getString('question');
         if (!question) {
             DiscordUtils.replyToInteraction(interaction, `Usage: \`!poll  Question ; Choice 1 ; Choice 2 ; Choice 3 ...\``);
             return;
         }
-        interaction.reply({embeds: [this.buildEmbed(question, choices, interaction.user.id)]});
+        await interaction.reply({embeds: [this.buildEmbed(question, choices, interaction.user.id)]});
         interaction.editReply({ embeds: [this.addFooter(question, choices,
             interaction.user.id, interaction.id)]});
         const pollMessage = await interaction.fetchReply();
         this.react(pollMessage, choices);
 
-        const reactArgs = interaction.options.getString('choices').trim().split(';');
+        let reactArgs =[];
+        if (interaction.options.getString('choices') !== null)
+            reactArgs = interaction.options.getString('choices').trim().split(';');
+
         if (typeof parseInt(reactArgs[0]) === 'number' && reactArgs.length === 1)
             try {
                 const lastMessage = await interaction.fetchReply();
