@@ -68,10 +68,6 @@ export default class RandomAcro {
         });
     }
 
-    static turnOn(): void {
-        exec('wakeonlan B4:2E:99:F1:F0:6A');
-    }
-
     static async theThing(message: Message): Promise<void> {
         if (!this.messageStore.has(message.channel.id)) {
             this.messageStore.set(message.channel.id, message);
@@ -168,8 +164,6 @@ export default class RandomAcro {
             } else if (cmd[0] === 'phil') {
                 const index = Math.floor(Math.random() * Utils.copyPasta.length);
                 DiscordUtils.sendChannelMessage(msg, Utils.copyPasta[index]);
-            } else if (cmd[0] === 'turnon') {
-                RandomAcro.turnOn();
             }
         });
 
