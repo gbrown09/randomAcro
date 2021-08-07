@@ -10,12 +10,6 @@ export default class DiscordUtils {
             await msg.delete();
     }
 
-    static async sendChannelMessageInt (interaction: Interaction, reply: string): Promise<void> {
-        const channel = await interaction.channel.fetch();
-        (channel as TextChannel).send(reply);
-    
-    }
-
     static async sendReply (msg: Message, reply: string): Promise<void> {
         msg.reply(reply);
     }
@@ -25,7 +19,7 @@ export default class DiscordUtils {
     }
 
     static async replyToInteractionDeffered (interaction: CommandInteraction, reply: string): Promise<void> {
-        await interaction.defer();
+        await interaction.deferReply();
         await interaction.editReply(reply);
     }
 
@@ -34,7 +28,7 @@ export default class DiscordUtils {
     }
 
     static async sendToChannelId (channelName: string, reply: string): Promise<void> {
-        const intents = new Intents(Intents.NON_PRIVILEGED);
+        const intents = new Intents();
         intents.add('GUILD_MESSAGES');
 
         const clientOptions: ClientOptions = {

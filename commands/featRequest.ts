@@ -35,24 +35,24 @@ export default class FeatRequest implements Command {
 
     }
     async executeSlashCommand(interaction: CommandInteraction): Promise<void> {
-        if(interaction.options.length > 0) {
+        if(interaction.options.data.length > 0) {
             const featureRequest: FeatureRequest = {
                 userId: interaction.user.id,
-                request: interaction.options.values[0].toString().substr(16),
+                request: interaction.options.getString('feature'),
                 userName: interaction.user.username,
                 done: false,
             };
             const reply = await Utils.postURL('http://localhost:3000/feature-request/create', featureRequest);
             if (featureRequest.userId === '348947681642545152') {
                 DiscordUtils.replyToInteractionDeffered(interaction, `Filing this one away as important thanks ${featureRequest.userName}`);
-                DiscordUtils.sendChannelMessageInt(interaction, `https://tenor.com/6R88.gif`);
+                DiscordUtils.replyToInteraction(interaction, `https://tenor.com/6R88.gif`);
             } else {
                 DiscordUtils.replyToInteractionDeffered(interaction, reply.data.message);
             }
         } else {
             const response = await Utils.getURL('http://localhost:3000/feature-request/all');
             const reply = await this.featStringBuilder (response);
-            DiscordUtils.sendChannelMessageInt(interaction, reply);
+            DiscordUtils.replyToInteraction(interaction, reply);
         }
 
     }

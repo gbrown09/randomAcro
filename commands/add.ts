@@ -19,7 +19,7 @@ export default class Add implements Command {
     }
 
     async executeSlashCommand (interaction: CommandInteraction): Promise<void> {
-        const url = `${this.dataUrl}addWord?word=${encodeURIComponent(interaction.options[0].value)}`;
+        const url = `${this.dataUrl}addWord?word=${encodeURIComponent(interaction.options.getString('word'))}`;
         const response = await Utils.postURLAuth(url);
         DiscordUtils.replyToInteractionDeffered(interaction, response);
     }

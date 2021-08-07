@@ -25,10 +25,10 @@ export default class Bday implements Command {
     async executeSlashCommand (interaction: CommandInteraction, bot?: Client): Promise<void> {
         this.bdayService = new BdayService(bot);
         let reply;
-        if (interaction.options.length === 0) 
+        if (interaction.options.data.length === 0) 
             reply = await BdayService.checkBday(interaction.user.id, '');
         else
-            reply = await  BdayService.checkBday(interaction.user.id, interaction.options[0].value.toString());
+            reply = await  BdayService.checkBday(interaction.user.id, interaction.options.getString('username'));
         DiscordUtils.replyToInteraction(interaction, reply);
     }
 }
