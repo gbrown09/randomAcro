@@ -23,9 +23,9 @@ export default class Poll implements Command {
             return;
         }
         choices.shift();
-        message.channel.send(this.buildEmbed(question, choices, message.author.id))
+        message.channel.send({embeds: [this.buildEmbed(question, choices, message.author.id)]})
             .then(async poll => {
-                poll.edit(this.addFooter(question, choices, message.author.id, poll.id));
+                poll.edit( { embeds: [this.addFooter(question, choices, message.author.id, poll.id) ]});
                 this.react(poll, choices);
                 await message.delete();
             });
@@ -44,19 +44,19 @@ export default class Poll implements Command {
     }
 
     async executeSlashCommand (interaction: CommandInteraction): Promise<void> {
-        const choices = interaction.options[1].value.toString().trim().split(';');
-        const question = interaction.options[0].value.toString();
+        const choices = interaction.options.getString('choices').trim().split(';');
+        const question = interaction.options.getString('question');
         if (!question) {
             DiscordUtils.replyToInteraction(interaction, `Usage: \`!poll  Question ; Choice 1 ; Choice 2 ; Choice 3 ...\``);
             return;
         }
-        interaction.reply(this.buildEmbed(question, choices, interaction.user.id));
-        interaction.editReply(this.addFooter(question, choices,
-            interaction.user.id, interaction.id));
+        interaction.reply({embeds: [this.buildEmbed(question, choices, interaction.user.id)]});
+        interaction.editReply({ embeds: [this.addFooter(question, choices,
+            interaction.user.id, interaction.id)]});
         const pollMessage = await interaction.fetchReply();
         this.react(pollMessage, choices);
 
-        const reactArgs = interaction.options[1].value.toString().trim().split(';');
+        const reactArgs = interaction.options.getString('choices').trim().split(';');
         if (typeof parseInt(reactArgs[0]) === 'number' && reactArgs.length === 1)
             try {
                 const lastMessage = await interaction.fetchReply();

@@ -19,7 +19,7 @@ export default class Acro implements Command {
     }
 
     async executeSlashCommand (interaction: CommandInteraction): Promise<void> {
-        const url = `${this.dataUrl}randomGet?acronym=${encodeURIComponent(interaction.options[0].value)}`;
+        const url = `${this.dataUrl}randomGet?acronym=${encodeURIComponent(interaction.options.getString('acronym'))}`;
         const response = await Utils.getURLAuth(url);
         DiscordUtils.replyToInteractionDeffered(interaction, response);
     }

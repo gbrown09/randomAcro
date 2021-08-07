@@ -68,14 +68,6 @@ export default class RandomAcro {
         });
     }
 
-    static turnOn(){
-        exec('wakeonlan -i 192.168.1.225 b4:2e:99:f1:f0:6a', (err) => {
-            if (err){
-                console.log(err);
-            }
-        });
-    }
-
     static async theThing(message: Message): Promise<void> {
         if (!this.messageStore.has(message.channel.id)) {
             this.messageStore.set(message.channel.id, message);
@@ -106,8 +98,8 @@ export default class RandomAcro {
     public init(): void {
         const rate = new Set();
         const commands: Command[] = [];
-        const botIntents = new Intents(Intents.NON_PRIVILEGED);
-        botIntents.add('GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS', 'DIRECT_MESSAGES', 'GUILD_MEMBERS');
+        const botIntents = new Intents(Intents.FLAGS.GUILD_MESSAGES);
+        botIntents.add(Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_MEMBERS);
         const clientOptions: ClientOptions = {
             intents: botIntents,
             partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
@@ -115,7 +107,7 @@ export default class RandomAcro {
         const bot = new Client(clientOptions);
 
         bot.on('ready', async () => {
-            const server = await bot.guilds.fetch(DiscordUtils.serverId, true);
+            const server = await bot.guilds.fetch(DiscordUtils.serverId);
             await server.members.fetch();
             //RandomAcro.startBday(bot);
             const glob = new Glob(`${__dirname}/../commands/**/*.js`, (er, files) => {
@@ -130,7 +122,7 @@ export default class RandomAcro {
             console.log(`Logged in as ${bot.user.tag}!`); 
         });
 
-        bot.on('message', async msg => {
+        bot.on('messageCreate', async msg => {
             if (msg.author.bot)
                 return;
             if(Utils.excludedChannels.includes(msg.channel.id)) 
@@ -172,14 +164,10 @@ export default class RandomAcro {
             } else if (cmd[0] === 'phil') {
                 const index = Math.floor(Math.random() * Utils.copyPasta.length);
                 DiscordUtils.sendChannelMessage(msg, Utils.copyPasta[index]);
-            } else if (cmd[0] === 'turnon') {
-                if (msg.author.id === '142777346448031744') {
-                RandomAcro.turnOn();
-                }
             }
         });
 
-        bot.on('interaction', async interaction => {
+        bot.on('interactionCreate', async interaction => {
             if (!interaction.isCommand())
                 return;
             const command = commands.find(c => c.name === interaction.commandName);
