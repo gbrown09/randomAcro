@@ -29,7 +29,7 @@ export default class DiscordUtils {
 
     static async sendToChannelId (channelName: string, reply: string): Promise<void> {
         const intents = new Intents();
-        intents.add('GUILD_MESSAGES');
+        intents.add(Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILDS);
 
         const clientOptions: ClientOptions = {
             intents,
