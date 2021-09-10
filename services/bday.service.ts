@@ -98,13 +98,13 @@ export default class BdayService {
         };
         try {
             const response = await Utils.postURL('http://localhost:3000/bday/create', bday);
-            const month = response.data.bday.date.substring(0, 2);
-            const day = response.data.bday.date.substring(3, 5);
+            const month = response.data.date.substring(0, 2);
+            const day = response.data.date.substring(3, 5);
             return `Can't wait for ${month}/${day} it's gonna be lit`;     
         } catch (error) {
             const response = await Utils.getURL(`http://localhost:3000/bday/bday/${id}`);
-            const month = response.data.bday.date.substring(0, 2);
-            const day = response.data.bday.date.substring(3, 5);
+            const month = response.data.date.substring(0, 2);
+            const day = response.data.date.substring(3, 5);
             return `I already have your birthday, it's ${month}/${day}`;
         }
     }

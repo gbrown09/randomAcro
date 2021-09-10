@@ -20,7 +20,7 @@ export default class AddBday implements Command {
 
     async executeSlashCommand (interaction: CommandInteraction): Promise<void> {
         const r = new RegExp('(0\\d{1}|1[0-2])\\/(0[1-9]|1\\d|2\\d|3[01])');
-        const input = interaction.options[0].value.toString();
+        const input = interaction.options.getString('date');
         if (r.test(input) !== true)
             DiscordUtils.replyToInteraction(interaction, 'Try an actual month dummy, the format is mm/dd pls');
         else
