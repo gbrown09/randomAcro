@@ -59,6 +59,14 @@ export default class Utils {
 
     ];
 
+    static riot: string [] = [
+        'https://tenor.com/bBtE0.gif',
+        'https://tenor.com/bFbMD.gif',
+        'https://tenor.com/Xjjn.gif',
+        'https://tenor.com/bTQ5q.gif',
+        'https://tenor.com/SfuL.gif',
+    ]
+
     static copyPasta: string[] = [
         `Which is funny because there is definitely literature out there that described finding SARS-COV-2 in penile tissue and linking that to ED`,
         `Oh boy. When I was a kid we were stationed in Germany where that song was popular. Eventually about the time I was in middle school we got moved to Texas. Playing in my room one night while listening to the radio that song popped into my head. I tried to call into the radio station I was listening to to request that song, and although I got on the air, the DJ had no fucking clue what song I was trying to describe`,
@@ -75,7 +83,8 @@ export default class Utils {
         `Spending is.. difficult. I'm all for spending if it's on the right things. I don't mind spending a few dollars so my neighbor can make it to the doctor or to help her weather being laid off. This relies on our elected officials to have a bit of integrity which is apparently lacking these days. Everyone likes to take the money and run. So, that said, an innovative stance would not be to simply want to spend less. It would be to evaluate what is being purchased--are our paid services being enacted? Are we shortchanging ourselves by relying on shoddy work from the lowest bidder in the endeavor to spend less? Is just paying people's bills as effective as directly employing them temporarily instead? So on so forth. We tend to outright ignore incrementalism which is where I think we'll find in years to come that we can make the greatest strides in shrinking government and spending less`,
         `I know we all like to joke that "adulting" is doing your taxes etc etc but nah. True "adulting" is having to sit your bonafide asshole of a dog down and have a discussion about not fucking up the mulch you just laid down because you're the one who has a job and has to pay for it and it's their fault you have to even do this in the first place because someone has no respect for either landscaping or hard work`,
         `Another thing about the DoD adoption of MS Teams is that outlook kills all emailed links so if someone emails a "join meeting" link it's dead on arrival. All these good ideas that are halfway thought through at best. I swear..`,
-        `Which makes it funny that it would be experienced as hitting harder because to generate that humoral immunity clonal selection has already occurred. I don't know off the top of my head if clonal selection and initial expansion is more or less resource intensive than memory expansion. But that also relies on resource intensiveness being a major driver of malaise and not just inflammation`
+        `Which makes it funny that it would be experienced as hitting harder because to generate that humoral immunity clonal selection has already occurred. I don't know off the top of my head if clonal selection and initial expansion is more or less resource intensive than memory expansion. But that also relies on resource intensiveness being a major driver of malaise and not just inflammation`,
+        `I fucking hate proline so fucking much it's the worst amino acid it's so fucking stupid it's incapable of being fucking normal so it forms an ugly ass ring with itself with its own fucking nitrogen cuz it's a loser fucking amino acid I hate it so much I'd rather cut off my right tit than have to ever draw a mechanism with proline ever again`
 
     ];
 
@@ -93,7 +102,7 @@ export default class Utils {
     }
 
     public static async getURL (url: string): Promise<AxiosResponse> {
-        let response: AxiosResponse;
+        let response!: AxiosResponse;
         try {
             response = await Axios.get(url);
         } catch (e) {
@@ -103,7 +112,7 @@ export default class Utils {
     }
 
     public static async postURL (url: string, data: any): Promise<AxiosResponse> {
-        let response: AxiosResponse;
+        let response!: AxiosResponse;
         try {
             response = await Axios.post(url, data);
         } catch (e) {
@@ -113,12 +122,12 @@ export default class Utils {
     }
 
     public static async getURLAuth (url: string): Promise<string> {
-        let response;
+        let response!: AxiosResponse;
         try {
             response = await Axios.get(url, {
                 auth: {
-                    username: process.env.USER_NAME,
-                    password: process.env.PASSWORD,
+                    username: process.env.USER_NAME || '',
+                    password: process.env.PASSWORD || '',
                 },
             });
         } catch (e) {
@@ -128,12 +137,12 @@ export default class Utils {
     }
 
     public static async postURLAuth (url: string): Promise<string> {
-        let response;
+        let response!: AxiosResponse;
         try {
             response = await Axios.post(url, {}, {
                 auth: {
-                    username: process.env.USER_NAME,
-                    password: process.env.PASSWORD,
+                    username: process.env.USER_NAME || '',
+                    password: process.env.PASSWORD || '',
                 },
             });
         } catch (e) {

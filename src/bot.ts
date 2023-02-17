@@ -1,9 +1,8 @@
-import { ApplicationCommandData, Client, ClientOptions, Intents, Message } from 'discord.js';
-import BdayService from '../services/bday.service';
-import { Command } from '../interfaces/command.interface';
+import { Client, ClientOptions, Collection, CollectorFilter, IntentsBitField, Message, Partials, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPostAPIContextMenuApplicationCommandsJSONBody, Routes } from 'discord.js';
+import { readdirSync } from 'fs';
 import DiscordUtils from './discordUtils';
-import { exec } from 'child_process';
-import { Glob } from 'glob';
+import { Command } from './interfaces/command.interface';
+import BdayService from './services/bday.service';
 import Utils from './utils';
 
 export default class RandomAcro {
@@ -18,7 +17,7 @@ export default class RandomAcro {
     constructor() {
         this.init();
         this.PREFIX = '!';
-        this.dataUrl = process.env.WORDS_API_URL;
+        this.dataUrl = process.env.WORDS_API_URL || '';
         DiscordUtils.serverId = process.env.DISCORD_SERVER_ID;
     }
 
@@ -33,12 +32,11 @@ export default class RandomAcro {
 
     static async rateLimitByUser(username: string, time:number, bot:Client, rate: Set<unknown>): Promise<void> {
         try {
-            const server = await bot.guilds.fetch(DiscordUtils.serverId);
+            const server = await bot.guilds.fetch(DiscordUtils.serverId || '');
             const user =  await server.members.fetch({query: username, limit:1});
-            console.log(username);
-            rate.add(user.first().user.id);
+            rate.add(user.first()?.user.id);
             setTimeout(() => {
-                rate.delete(user.first().user.id);
+                rate.delete(user.first()?.user.id);
             }, time);
         } catch(e){
             console.log(e);
@@ -51,21 +49,35 @@ export default class RandomAcro {
     }
 
     static updateCommands(bot: Client): void {
-        const data :ApplicationCommandData[] = [];
+        const commandsJson: (RESTPostAPIChatInputApplicationCommandsJSONBody | RESTPostAPIContextMenuApplicationCommandsJSONBody)[] = [];
 
-        const slashglob = new Glob(`${__dirname}/../slashCommands/**/*.js`, async (er, files) => {
-            files.forEach(f => {
-                const command = require(f);
-                if (command)
-                    data.push(command);
-            });
-
-            try {
-                await bot.guilds.cache.get(DiscordUtils.serverId)?.commands.set(data);
-            } catch (e) {
-                console.log(e);
+        bot.commands = new Collection();
+            const commandFiles = readdirSync(`${__dirname}/commands`).filter(file => file.endsWith('.js'));
+            for (const file of commandFiles) {
+                const command: Command = require(`${__dirname}/commands/${file}`);
+                if ('data' in command && 'run' in command) {
+                    bot.commands.set(command.data.name, command);
+                    commandsJson.push(command.data.toJSON())
+                }
             }
-        });
+
+        const rest = new REST({ version: '10' }).setToken(process.env.BOT_TOKEN!);
+        (async () => {
+            try {
+                console.log(`Started refreshing ${bot.commands.size} application (/) commands.`);
+        
+                // The put method is used to fully refresh all commands in the guild with the current set
+                const data = await rest.put(
+                    Routes.applicationGuildCommands(process.env.APPLICATION_ID!, DiscordUtils.serverId!),
+                    { body: commandsJson },
+                );
+        
+                //console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+            } catch (error) {
+                // And of course, make sure you catch and log any errors!
+                console.error(error);
+            }
+        })();
     }
 
     static async theThing(message: Message): Promise<void> {
@@ -80,6 +92,7 @@ export default class RandomAcro {
     }
 
     static memeStuff(content: string, message: Message): void {
+        let dfj = message.client.emojis.cache.find(emoji => emoji.name === "JhnFry");
         if (content.toLowerCase().includes('how many') && content.toLowerCase().includes('?'))
             DiscordUtils.sendChannelMessage(message, '6', false);
 
@@ -91,55 +104,85 @@ export default class RandomAcro {
             const index = Math.floor(Math.random() * 4);
             DiscordUtils.sendChannelMessage(message, Utils.thanks[index], false);
         }
-        if (content.toLowerCase().includes('idiot bot'))
+        if (content.toLowerCase().includes('idiot bot')) {
             DiscordUtils.sendChannelMessage(message, 'https://tenor.com/view/ryan-stiles-middle-finger-flip-off-pocket-gif-3797474', false);
+        }
+        if (content.toLowerCase().includes('dfj')){
+            DiscordUtils.sendChannelMessage(message, `<:JhnFry:598754412311347200>`);
+        }
+        if ((message.mentions.users.has('142777346448031744') || content.toLowerCase().includes('grt')) && content.toLowerCase().includes('spider')) {
+            DiscordUtils.sendChannelMessage(message, `I think you mean: "${content.replace('spider', 'box')}"`)
+        }  
+        if (content.toLowerCase() === 'tbf' || content.toLowerCase() === 'to be fair') {
+            DiscordUtils.sendChannelMessage(message, `To be faaaaaair`)
+        }
+    }
+
+    static banRev(message: Message) {
+        const filter: CollectorFilter<any> = (reaction: { emoji: { name: string; }; }) => {
+            return reaction.emoji.name === 'AniBanned';
+        };
+
+        message.awaitReactions({ filter, max:4, time:60000})
+        .then(collected => {      
+            if (collected.size >= 4) {
+               message.member?.timeout(1 * 60 * 1000, 'Bad puns')
+            }
+        })
+        
     }
 
     public init(): void {
         const rate = new Set();
-        const commands: Command[] = [];
-        const botIntents = new Intents();
-        botIntents.add(Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS);
+        //const commands: Command[] = [];
+        const botIntents = new IntentsBitField();
+        botIntents.add(IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.GuildMessageReactions, IntentsBitField.Flags.DirectMessages, 
+            IntentsBitField.Flags.GuildMembers, IntentsBitField.Flags.GuildEmojisAndStickers, IntentsBitField.Flags.MessageContent);
         const clientOptions: ClientOptions = {
             intents: botIntents,
-            partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+            partials: [Partials.Message, Partials.Channel, Partials.Reaction],
         };
         const bot = new Client(clientOptions);
 
         bot.on('ready', async () => {
-            const server = await bot.guilds.fetch(DiscordUtils.serverId);
+            const server = await bot.guilds.fetch(DiscordUtils.serverId!);
             await server.members.fetch();
-            //RandomAcro.startBday(bot);
-            const glob = new Glob(`${__dirname}/../commands/**/*.js`, (er, files) => {
-                files.forEach(f => {
-                    const CommandClass = require(f).default;
-                    if (CommandClass) {
-                        const command = new CommandClass() as Command;
-                        commands.push(command);
-                    }
-                });
-            });
-            console.log(`Logged in as ${bot.user.tag}!`); 
+
+            bot.commands = new Collection();
+            const commandFiles = readdirSync(`${__dirname}/commands`).filter(file => file.endsWith('.js'));
+            for (const file of commandFiles) {
+                const command: Command = require(`${__dirname}/commands/${file}`);
+                if ('data' in command && 'run' in command) {
+                    bot.commands.set(command.data.name, command);
+                }
+            }
+
+            //RandomAcro.updateCommands(bot);
+            
+            console.log(`Logged in as ${bot.user?.tag}!`); 
         });
 
-        bot.on('messageCreate', async msg => {
+        bot.on('messageCreate', async msg => {            
             if (msg.author.bot)
                 return;
             if(Utils.excludedChannels.includes(msg.channel.id)) 
                 return;
             RandomAcro.memeStuff(msg.content, msg);
             RandomAcro.theThing(msg);
+           if (msg.author.id === '187732585672081409') {
+                RandomAcro.banRev(msg);
+           }
 
             const cmd = msg.content.substring(this.PREFIX.length).split(' ');
-            const command = commands.find(c => c.name === cmd[0].toLowerCase());
-            if (command && command.name !== 'acrohelp') {
+            const command = bot.commands.get(cmd[0].toLowerCase());
+            if (command && command.data.name !== 'acrohelp') {
                 if (RandomAcro.checkLimit(msg.author.id, rate)) {
                     DiscordUtils.sendReply(msg, `The all powerful bot creator has decided you're getting too spammy, chill out for a bit and try again later`);
                     return;
                 }
                 cmd.shift();
-                await command.executeCommand(msg, cmd, bot);
-            } else if (cmd[0] === 'acrohelp') {
+                //await command.run(msg, cmd, bot);
+            } /* else if (cmd[0] === 'acrohelp') {
                 let help = 'Here is the list of bot commands: \n';
                 commands.forEach(c => {
                     let commandHelp = `!${c.name}`;
@@ -151,7 +194,7 @@ export default class RandomAcro {
                     help = `${help} ${commandHelp} - ${c.description}\n\n`;
                 });
                 DiscordUtils.sendReply(msg, help);
-            } else if (cmd[0] === 'rateLimit') {
+            } */ else if (cmd[0] === 'rateLimit') {
                 if (msg.author.id === '142777346448031744')
                     RandomAcro.rateLimitByUser(cmd[1], parseInt(cmd[2]), bot, rate);
                 else
@@ -161,22 +204,21 @@ export default class RandomAcro {
                     RandomAcro.updateCommands(bot);
                     console.log("updated commands");
                 }
-            } else if (cmd[0] === 'phil') {
-                const index = Math.floor(Math.random() * Utils.copyPasta.length);
-                DiscordUtils.sendChannelMessage(msg, Utils.copyPasta[index]);
+            } else if (cmd[0] === 'test') {
+                BdayService.sendBday();
             }
         });
 
         bot.on('interactionCreate', async interaction => {
-            if (!interaction.isCommand())
+            if (!interaction.isCommand() && !interaction.isContextMenuCommand())
                 return;
-            const command = commands.find(c => c.name === interaction.commandName);
-            if (command && command.name !== 'help') {
+            const command = bot.commands.get(interaction.commandName)
+            if (command && command.data.name !== 'help') {
                 if (RandomAcro.checkLimit(interaction.user.id, rate)) {
                     DiscordUtils.replyToInteraction(interaction, `The all powerful bot creator has decided you're getting too spammy, chill out for a bit and try again later`);
                     return;
                 }
-                await command.executeSlashCommand(interaction, bot);
+                await command.run(interaction);
             }
         });
 
