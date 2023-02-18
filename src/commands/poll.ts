@@ -1,9 +1,9 @@
-import { Collection, Message, MessageReaction, SlashCommandBuilder } from 'discord.js';
-import DiscordUtils from '../discordUtils';
-import PollService from '../services/poll.service';
-import { Command } from '../interfaces/command.interface';
-import Utils from '../utils';
+import { Collection, MessageReaction, SlashCommandBuilder } from 'discord.js';
 import { get } from 'node-emoji';
+import DiscordUtils from '../discordUtils';
+import { Command } from '../interfaces/command.interface';
+import PollService from '../services/poll.service';
+import Utils from '../utils';
 
 const command: Command = {
     data: new SlashCommandBuilder()
@@ -34,14 +34,15 @@ const command: Command = {
                 return;
             }
 
-            const embed = PollService.buildEmbed(interaction);
+            const minutes = interaction.options.getInteger('time') || 5
+
+            const embed = PollService.buildEmbed(interaction, minutes);
             await interaction.reply({embeds: [embed]});
 
-            const embedFooter = PollService.addFooter(interaction);
+            const embedFooter = PollService.addFooter(interaction, minutes);
             interaction.editReply({ embeds: [embedFooter]});
             const pollMessage = await interaction.fetchReply();
             
-            const minutes = interaction.options.getInteger('time') || 5
             const reactionCollector = pollMessage.createReactionCollector({time: minutes * 60 * 1000})
             await PollService.react(pollMessage, choices);
             

@@ -1,6 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { IntentsBitField, UserResolvable } from 'discord.js';
-import { Client, ClientOptions, CommandInteraction, ContextMenuCommandInteraction, Interaction, Message, TextChannel } from 'discord.js';
+import { Client, ClientOptions, CommandInteraction, ContextMenuCommandInteraction, IntentsBitField, Message, TextChannel } from 'discord.js';
 import Utils from './utils';
 
 export default class DiscordUtils {

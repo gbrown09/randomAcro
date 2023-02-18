@@ -1,4 +1,4 @@
-import { Collection, CommandInteraction, Embed, EmbedBuilder, Emoji, Message, MessageCreateOptions, MessagePayload, MessageReaction, ReactionEmoji } from "discord.js";
+import { Collection, CommandInteraction, EmbedBuilder, Message, MessageReaction } from "discord.js";
 import { get } from "node-emoji";
 import DiscordUtils from "../discordUtils";
 import Utils from "../utils";
@@ -9,14 +9,14 @@ export default class PollService {
 
     static no = get('x');
 
-    static buildEmbed (interaction: CommandInteraction): EmbedBuilder {
+    static buildEmbed (interaction: CommandInteraction, minutes: number): EmbedBuilder {
         let embed = new EmbedBuilder();
         if(interaction.isChatInputCommand()) {
             const question = interaction.options.getString('question');
             let choices: string[] = [];
             if (interaction.options.getString('choices') !== null)
                 choices = interaction.options.getString('choices')!.trim().split(';');
-            embed.setDescription(`🗒 Poll from ${DiscordUtils.mentionUser(interaction.user.id)}`)
+            embed.setDescription(`🗒 Poll from ${DiscordUtils.mentionUser(interaction.user.id)} open for ${minutes} minutes`)
             .setColor('#00AE86')
             .addFields({name:`**${question}**`, value:this.buildChoices(choices)});
         }
@@ -51,8 +51,8 @@ export default class PollService {
         return res;
     }
 
-    static addFooter(interaction: CommandInteraction): EmbedBuilder {
-        return this.buildEmbed(interaction).setFooter({text:`ID: ${interaction.user.id}`});
+    static addFooter(interaction: CommandInteraction, minutes: number): EmbedBuilder {
+        return this.buildEmbed(interaction, minutes).setFooter({text:`ID: ${interaction.user.id}`});
     }
 
     static async react (poll: Message<boolean> , choices: string[]): Promise<void> {
@@ -85,7 +85,7 @@ export default class PollService {
 
         })
         const embed = new EmbedBuilder()
-            .setTitle("Poll Results")
+            .setTitle('The Results are in:')
             .setColor('#00AE86')
             .addFields({name:`Choices`, value: choices, inline: true})
             .addFields({name:`Results`, value: resultsString, inline: true});

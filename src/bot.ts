@@ -140,7 +140,7 @@ export default class RandomAcro {
             IntentsBitField.Flags.GuildMembers, IntentsBitField.Flags.GuildEmojisAndStickers, IntentsBitField.Flags.MessageContent);
         const clientOptions: ClientOptions = {
             intents: botIntents,
-            partials: [Partials.Message, Partials.Channel, Partials.Reaction],
+            partials: [Partials.Message, Partials.Channel, Partials.Reaction, Partials.User],
         };
         const bot = new Client(clientOptions);
 

@@ -1,6 +1,6 @@
-import { CommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { Command } from '../interfaces/command.interface';
+import { SlashCommandBuilder } from 'discord.js';
 import DiscordUtils from '../discordUtils';
+import { Command } from '../interfaces/command.interface';
 import Utils from '../utils';
 
 
