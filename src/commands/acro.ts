@@ -16,7 +16,7 @@ const command: Command = {
         if (interaction.isChatInputCommand() && interaction.options) {
             const url = `${process.env.WORDS_API_URL}randomGet?acronym=${encodeURIComponent(interaction.options.getString('acronym')!)}`;
             const response = await Utils.getURLAuth(url);
-            DiscordUtils.replyToInteractionDeffered(interaction, response);
+            DiscordUtils.replyToInteraction(interaction, response);
         }
     }
 

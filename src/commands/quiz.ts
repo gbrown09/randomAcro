@@ -1,4 +1,4 @@
-import { ActionRowBuilder, CollectorFilter, ComponentType, SlashCommandBuilder, StringSelectMenuBuilder } from "discord.js";
+import { ActionRowBuilder, CollectorFilter, ComponentType, SlashCommandBuilder, StringSelectMenuBuilder, TextChannel } from "discord.js";
 import { Command } from "../interfaces/command.interface";
 import QuizService from "../services/quiz.service";
 const command: Command = {
@@ -83,7 +83,7 @@ const command: Command = {
                     return i.customId === question.answer && i.user.id === interaction.user.id;
                 }
 
-               await interaction.channel?.awaitMessageComponent({filter, componentType: ComponentType.StringSelect, time: .3 * 60 * 1000})
+               await (interaction.channel as TextChannel).awaitMessageComponent({filter, componentType: ComponentType.StringSelect, time: .3 * 60 * 1000})
                .then(async (answerInt) => {
                     actionRow.components[0].setDisabled(true);
                     if(answerInt.values[0] === question.answer) {

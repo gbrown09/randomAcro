@@ -11,7 +11,7 @@ const command: Command = {
         .addStringOption(option => 
             option.setName('philism')
             .setDescription('what phil said')
-            .setRequired(true)),
+            .setRequired(false)),
     run: async (interaction) =>  {
         if (interaction.isChatInputCommand()) {
             if(interaction.options.data.length > 0) {
@@ -19,7 +19,7 @@ const command: Command = {
                     philText: interaction.options.getString('philism')!
                 };
                 const reply = await Utils.postURL('http://backend:3000/phil/create', philText);
-                DiscordUtils.replyToInteractionDeffered(interaction, reply.data.message);   
+                DiscordUtils.replyToInteraction(interaction, reply.data.message);   
             } else {
                 const response = await Utils.getURL('http://backend:3000/phil/phils');
                 const index = Math.floor(Math.random() * response.data.length);

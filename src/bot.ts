@@ -4,6 +4,7 @@ import DiscordUtils from './discordUtils';
 import { Command } from './interfaces/command.interface';
 import BdayService from './services/bday.service';
 import Utils from './utils';
+import BanService from './services/ban.service';
 
 export default class RandomAcro {
     dataUrl: string;
@@ -25,6 +26,8 @@ export default class RandomAcro {
         try {
             const bdayService = new BdayService(bot);
             bdayService.startJob();
+            const banService = new BanService();
+            banService.startJob();
         } catch (e) {
             console.log(e);
         }
@@ -147,7 +150,7 @@ export default class RandomAcro {
         bot.on('ready', async () => {
             const server = await bot.guilds.fetch(DiscordUtils.serverId!);
             await server.members.fetch();
-
+            RandomAcro.startBday(bot);
             bot.commands = new Collection();
             const commandFiles = readdirSync(`${__dirname}/commands`).filter(file => file.endsWith('.js'));
             for (const file of commandFiles) {
@@ -156,8 +159,6 @@ export default class RandomAcro {
                     bot.commands.set(command.data.name, command);
                 }
             }
-
-            //RandomAcro.updateCommands(bot);
             
             console.log(`Logged in as ${bot.user?.tag}!`); 
         });
@@ -218,6 +219,7 @@ export default class RandomAcro {
                     DiscordUtils.replyToInteraction(interaction, `The all powerful bot creator has decided you're getting too spammy, chill out for a bit and try again later`);
                     return;
                 }
+                console.log(`Running ${command.data.name}`)
                 await command.run(interaction);
             }
         });
