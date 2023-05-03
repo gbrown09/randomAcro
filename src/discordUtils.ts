@@ -1,12 +1,13 @@
 import { AxiosResponse } from 'axios';
 import { Client, ClientOptions, CommandInteraction, ContextMenuCommandInteraction, IntentsBitField, Message, TextChannel } from 'discord.js';
+import { Car } from './interfaces/car.interface';
 import Utils from './utils';
 
 export default class DiscordUtils {
     static serverId = process.env.DISCORD_SERVER_ID;
 
     static async sendChannelMessage (msg: Message, reply: string, del = true): Promise<void> {
-        msg.channel.send(reply);
+        (msg.channel as TextChannel).send(reply);
         if (del)
             await msg.delete();
     }
@@ -15,13 +16,12 @@ export default class DiscordUtils {
         msg.reply(reply);
     }
 
-    static async replyToInteraction (interaction: CommandInteraction | ContextMenuCommandInteraction, reply: string): Promise<void> {
-        await interaction.reply(reply);
+    static async sendChannelMessageInt (interaction: CommandInteraction, message: string): Promise<void> {
+        await (interaction.channel as TextChannel).send(message);
     }
 
-    static async replyToInteractionDeffered (interaction: CommandInteraction | ContextMenuCommandInteraction, reply: string): Promise<void> {
-        await interaction.deferReply();
-        await interaction.editReply(reply);
+    static async replyToInteraction (interaction: CommandInteraction | ContextMenuCommandInteraction, reply: string): Promise<void> {
+        await interaction.reply(reply);
     }
 
     static mentionUser (id: string): string {
@@ -39,7 +39,7 @@ export default class DiscordUtils {
         bot.on('ready', async () => {
             const server = await bot.guilds.fetch(DiscordUtils.serverId || '');
             const channel = server.channels.cache.get(Utils.channelIds.get(channelName) || '');
-            (channel as TextChannel).send(reply);
+            await (channel as TextChannel).send(reply);
         }).destroy();
 
         bot.login(process.env.BOT_TOKEN);
@@ -67,5 +67,33 @@ export default class DiscordUtils {
                 ecoString += `${index+1}. ${feat.request} **Requested By**: ${feat.userName}\n`;
         });
         return ecoString;
+    }
+
+    static async carStringBuilder(carList: Car[]): Promise<string>{
+        let ecoString = `Here's Everyones Cars:\n`;
+        carList.forEach( (car: Car) => {
+            ecoString += `${car.owner}: ${car.year} ${car.make} ${car.model}\n`
+        });
+        return ecoString;
+    }
+
+    static chopMessages(message: string, messageBin: string[]) {
+        if (message.length <= 2000) {
+            messageBin.push(message);
+            return messageBin;
+        }
+
+        let maxString = message.substring(0, 2000);
+
+        const regex = /[\r\n]+/gm;
+        const match = maxString.match(regex)!;
+        const lastIndex = maxString.lastIndexOf(match[match.length - 1]);
+        if (lastIndex === 2000 - 4) {
+            messageBin.push(maxString);
+            this.chopMessages(message.substring(lastIndex + 3), messageBin);
+        } else {
+            messageBin.push(maxString.substring(0, lastIndex));
+            this.chopMessages(message.substring(lastIndex), messageBin);
+        }
     }
 }

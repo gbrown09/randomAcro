@@ -1,6 +1,6 @@
-import { CommandInteraction, ContextMenuCommandBuilder, ContextMenuCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { CommandInteraction, ContextMenuCommandBuilder, ContextMenuCommandInteraction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js';
 
 export interface Command {
-    data: Omit<SlashCommandBuilder, "addSubcommandGroup" | "addSubcommand"> | ContextMenuCommandBuilder;
+    data: Omit<SlashCommandBuilder, "addSubcommandGroup" | "addSubcommand"> | ContextMenuCommandBuilder| SlashCommandSubcommandsOnlyBuilder;
     run: (interaction: CommandInteraction | ContextMenuCommandInteraction) => Promise<void>;
 }

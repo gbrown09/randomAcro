@@ -15,7 +15,7 @@ const command: Command = {
         if (interaction.isChatInputCommand()) {
             const url = `${process.env.WORDS_API_URL}addWord?word=${encodeURIComponent(interaction.options.getString('word')!)}`;
             const response = await Utils.postURLAuth(url);
-            DiscordUtils.replyToInteractionDeffered(interaction, response);
+            DiscordUtils.replyToInteraction(interaction, response);
         }
     }
 };

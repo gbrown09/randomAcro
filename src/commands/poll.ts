@@ -1,4 +1,4 @@
-import { Collection, MessageReaction, SlashCommandBuilder } from 'discord.js';
+import { Collection, MessageReaction, SlashCommandBuilder, TextChannel } from 'discord.js';
 import { get } from 'node-emoji';
 import DiscordUtils from '../discordUtils';
 import { Command } from '../interfaces/command.interface';
@@ -19,7 +19,7 @@ const command: Command = {
             .setRequired(false))
         .addIntegerOption(option =>
             option.setName('time')
-            .setDescription('time(in mins) you want the poll open (Default:5)')
+            .setDescription('time(in mins) you want the poll open (Default:15)')
             .setRequired(false)),
     run: async (interaction) =>  {
         const pollService = new PollService();
@@ -34,7 +34,7 @@ const command: Command = {
                 return;
             }
 
-            const minutes = interaction.options.getInteger('time') || 5
+            const minutes = interaction.options.getInteger('time') || 15
 
             const embed = PollService.buildEmbed(interaction, minutes);
             await interaction.reply({embeds: [embed]});
@@ -67,7 +67,7 @@ const command: Command = {
                 }
             
 
-            reactionCollector.on('end', collected => {
+            reactionCollector.on('end', async collected => {
                 if (choices && choices.length === 0){
                     choices.push('Yes');
                     choices.push('No')
@@ -91,7 +91,9 @@ const command: Command = {
                 const embedResults = PollService.pollResults(reactionCollection);
                 embedResults.setTitle(`The Winner Is: **${reactionCollection.sort((A, B) => B - A).firstKey()}**`)
                 embedResults.setFooter({text:`Total Votes: ${totalVotes}`});
-                interaction.channel?.send({embeds: [embedResults]});
+                if(interaction.channel?.isTextBased()){
+                    await (interaction.channel as TextChannel).send({embeds: [embedResults]});
+                }
             });
         }
     }

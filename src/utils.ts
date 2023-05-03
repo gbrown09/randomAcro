@@ -90,10 +90,50 @@ export default class Utils {
         return response;
     }
 
+    public static async getURLWithData (url: string, body: any): Promise<AxiosResponse> {
+        let response!: AxiosResponse;
+        try {
+            response = await Axios.get(url, {data: body});
+        } catch (e) {
+            console.log(e);
+        }
+        return response;
+    }
+
     public static async postURL (url: string, data: any): Promise<AxiosResponse> {
         let response!: AxiosResponse;
         try {
             response = await Axios.post(url, data);
+        } catch (e) {
+            //console.log(e);
+        }
+        return response;
+    }
+
+    public static async patchURLWithData (url: string, data: any): Promise<AxiosResponse> {
+        let response!: AxiosResponse;
+        try {
+            response = await Axios.patch(url, data);
+        } catch (e) {
+            //console.log(e);
+        }
+        return response;
+    }
+
+    public static async patchURL (url: string): Promise<AxiosResponse> {
+        let response!: AxiosResponse;
+        try {
+            response = await Axios.patch(url);
+        } catch (e) {
+            //console.log(e);
+        }
+        return response;
+    }
+
+    public static async deleteURL (url: string, body: any): Promise<AxiosResponse> {
+        let response!: AxiosResponse;
+        try {
+            response = await Axios.delete(url, {data: body});
         } catch (e) {
             //console.log(e);
         }

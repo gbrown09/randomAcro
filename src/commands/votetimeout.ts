@@ -1,6 +1,8 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Collection, CollectorFilter, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Collection, CollectorFilter, EmbedBuilder, SlashCommandBuilder, TextChannel } from "discord.js";
 import { Command } from "../interfaces/command.interface";
 import PollService from "../services/poll.service";
+import BanService from "../services/ban.service";
+import { Ban } from "../interfaces/ban.interface";
 
 const command: Command = {
     data: new SlashCommandBuilder()
@@ -41,7 +43,7 @@ const command: Command = {
 
             await interaction.reply({embeds: [embed], components: [buttons]});
             const filter: CollectorFilter<any> = i => i.customId === `${interaction.id}${interaction.user.id}Y` || i.customId === `${interaction.id}${interaction.user.id}N`;
-            const buttonCollector = interaction.channel?.createMessageComponentCollector({filter, time:  3 * 60 * 1000 });
+            const buttonCollector = (interaction.channel as TextChannel).createMessageComponentCollector({filter, time:  3 * 60 * 1000 });
             let yes: number = 0;
             let no: number = 0;
             let voted: string[] = []
@@ -60,30 +62,37 @@ const command: Command = {
                 }        
             });
 
-            buttonCollector?.on('end', async collected => {
+            buttonCollector?.on('end', async () => {
                 buttons.components[0].setDisabled(true)
                 buttons.components[1].setDisabled(true);
                 await interaction.editReply({embeds: [embed], components: [buttons]})
                 
-                const totalVotes: number = collected.size;
+                const totalVotes: number = yes + no;
                 if(totalVotes > 3) {
                     const results: Collection<string, number> = new Collection()
                     let percentYes: number = Math.round((yes/totalVotes) * 100);
                     let percentNo: number = Math.round((no/totalVotes) * 100);
                     if (percentYes > percentNo) {
-                        interaction.channel?.send(`The yays have it say goodbye ${victim}`)
-                        victim.timeout(3 * 60 * 1000, 'Voted Off the Island')
+                        const banInfo = await BanService.banTransaction(victim.user.username);
+                        const mult = banInfo.multiplier ?? 0;
+                        const minutes = 1 + 1*mult
+                        await (interaction.channel as TextChannel).send(`The yays have it say goodbye ${victim}\n You've been banned ${mult} time(s) this month so you're banned for ${minutes} minute(s)`)
+                        victim.timeout((minutes) * 60 * 1000, 'Voted Off the Island')
+                        const updateBan: Ban = {
+                            user: banInfo.user,
+                            multiplier: banInfo.multiplier! +1
+                        }
                         
                     } else {
-                        interaction.channel?.send('You live another day')
+                        await (interaction.channel as TextChannel).send('You live another day')
                     }
                     results.set('No', percentNo);
                     results.set('Yes', percentYes);
                     const embedResults = PollService.pollResults(results);
                     embedResults.setFooter({text:`Total Votes: ${totalVotes}`});
-                    interaction.channel?.send({embeds: [embedResults]})
+                    await (interaction.channel as TextChannel).send({embeds: [embedResults]})
                 } else {
-                    interaction.channel?.send('Need at least 3 votes womp womp')
+                    await (interaction.channel as TextChannel).send('Need at least 3 votes womp womp')
                 }
             })
         }

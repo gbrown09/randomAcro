@@ -24,7 +24,7 @@ export default class BdayService {
     public static async sendBday (): Promise<void> {
         const today = Utils.getCurrentDate();
         const newFact = await BdayService.fact(today.substring(0, 2), today.substring(3, 5));
-        const bdayList = await Utils.getURL('http://backend:3000/bday/bdays');
+        const bdayList = await Utils.getURL(`${process.env.ACRO_API}/bday/bdays`);
         const bdaysToday: any[] = [];
         let bdaystring = 'Happy Birthday! <:birthday:804063725904330772>  ';
         bdayList.data.forEach((bday: { date: string; userId: any; }) => {
@@ -72,7 +72,7 @@ export default class BdayService {
         }
         let response;
         try {
-            response = await Utils.getURL(`http://backend:3000/bday/bday/${userid}`);
+            response = await Utils.getURL(`${process.env.ACRO_API}/bday/bday/${userid}`);
         } catch(e){
             return noBdayString;
         }
@@ -96,12 +96,12 @@ export default class BdayService {
             date
         };
         try {
-            const response = await Utils.postURL('http://backend:3000/bday/create', bday);
+            const response = await Utils.postURL(`${process.env.ACRO_API}bday/create`, bday);
             const month = response.data.date.substring(0, 2);
             const day = response.data.date.substring(3, 5);
             return `Can't wait for ${month}/${day} it's gonna be lit`;     
         } catch (error) {
-            const response = await Utils.getURL(`http://backend:3000/bday/bday/${id}`);
+            const response = await Utils.getURL(`${process.env.ACRO_API}/bday/bday/${id}`);
             const month = response.data.date.substring(0, 2);
             const day = response.data.date.substring(3, 5);
             return `I already have your birthday, it's ${month}/${day}`;
@@ -116,7 +116,7 @@ export default class BdayService {
         let nextString = '';
         const  diff: {[key: string]: any}  = {};
 
-        const bdayList = await Utils.getURL('http://backend:3000/bday/bdays');
+        const bdayList = await Utils.getURL(`${process.env.ACRO_API}/bday/bdays`);
         bdayList.data.forEach((bday: { date: string; }) => {
             allDays.push(bday.date);
         });

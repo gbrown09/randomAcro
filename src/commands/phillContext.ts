@@ -14,10 +14,10 @@ const command: Command = {
                 const philText: Phil = {
                     philText: interaction.options.getMessage('message')!.content
                 };
-                const reply = await Utils.postURL('http://backend:3000/phil/create', philText);
-                DiscordUtils.replyToInteractionDeffered(interaction, reply.data.message);
+                const reply = await Utils.postURL('${process.env.ACRO_API}/phil/create', philText);
+                DiscordUtils.replyToInteraction(interaction, reply.data.message);
             } else 
-                DiscordUtils.replyToInteractionDeffered(interaction, `Looks like Phil didn't say that`);
+                DiscordUtils.replyToInteraction(interaction, `Looks like Phil didn't say that`);
         }
     }
 };
