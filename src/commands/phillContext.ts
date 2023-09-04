@@ -14,7 +14,7 @@ const command: Command = {
                 const philText: Phil = {
                     philText: interaction.options.getMessage('message')!.content
                 };
-                const reply = await Utils.postURL('${process.env.ACRO_API}/phil/create', philText);
+                const reply = await Utils.postURL(`${process.env.ACRO_API}/phil/create`, philText);
                 DiscordUtils.replyToInteraction(interaction, reply.data.message);
             } else 
                 DiscordUtils.replyToInteraction(interaction, `Looks like Phil didn't say that`);

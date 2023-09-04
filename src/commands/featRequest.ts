@@ -20,7 +20,7 @@ const command: Command = {
                 userName: interaction.user.username,
                 done: false,
             };
-            const reply = await Utils.postURL('${process.env.ACRO_API}/feature-request/create', featureRequest);
+            const reply = await Utils.postURL(`${process.env.ACRO_API}/feature-request/create`, featureRequest);
             if (featureRequest.userId === '348947681642545152') {
                 await DiscordUtils.replyToInteraction(interaction, `Filing this one away as important thanks ${featureRequest.userName}`)
                 await (interaction.channel as TextChannel).send(`https://tenor.com/6R88.gif`)
@@ -28,7 +28,7 @@ const command: Command = {
                 await interaction.reply(reply.data.message);
             }
         } else {
-            const response = await Utils.getURL('${process.env.ACRO_API}/feature-request/all');
+            const response = await Utils.getURL(`${process.env.ACRO_API}/feature-request/all`);
             const reply = await DiscordUtils.featStringBuilder (response);
             await interaction.deferReply();
             if (reply.length > 2000) {

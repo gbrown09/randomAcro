@@ -2,7 +2,7 @@ import { Car } from '../interfaces/car.interface';
 import Utils from '../utils';
 
 export default class CarService {
-    public static async checkCar (car: Car): Promise<boolean> {
+    public static async checkCar (car: Car): Promise<{_id: any}> {
         let response;
         try {
             response = await Utils.getURLWithData(`${process.env.ACRO_API}/cars/check`, car);

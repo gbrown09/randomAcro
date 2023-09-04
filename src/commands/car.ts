@@ -60,7 +60,7 @@ const command: Command = {
                         model: interaction.options.getString('model')!
                     }
 
-                    if(!await CarService.checkCar(carDto)){
+                    if(await CarService.checkCar(carDto) === null){
                         const reply = await CarService.addCar(carDto);
                         await interaction.reply({content: reply, ephemeral: true})
                     } else {
@@ -82,7 +82,7 @@ const command: Command = {
                         model: interaction.options.getString('model')!
                     };
 
-                    if(await CarService.checkCar(carDto)){
+                    if(await CarService.checkCar(carDto) !== null){
                         const reply = await CarService.removeCar(carDto);
                         await interaction.reply({content: reply, ephemeral: true})
                     } else {
